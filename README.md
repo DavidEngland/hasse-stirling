@@ -2,6 +2,29 @@
 
 A Python implementation of the Hasse-Stirling computational framework for efficient calculation of special functions.
 
+---
+
+## Project Overview
+
+This repository develops and documents the **Hasse-Stirling Operator** and its applications in discrete calculus, special functions, and combinatorics. It includes:
+
+- Core Python implementations
+- Operator tables and transform cheatsheets
+- Mathematical explanations and derivations
+- Educational modules and physical interpretations
+
+See `transform explained.md` for a detailed mathematical introduction.
+
+---
+
+## Code Status
+
+- **Implementation status:** The Python code is under active development. Core routines for the Hasse-Stirling operator and generalized Stirling numbers are present, but some features may be experimental or incomplete.
+- **Testing:** Not all modules are fully tested. Please review and validate results for critical applications.
+- **Contributions:** Feedback, bug reports, and pull requests are welcome to improve robustness and coverage.
+
+---
+
 ## Features
 
 - Generalized Hasse operator with flexible parameterization $(\alpha, \beta, r)$
@@ -18,6 +41,15 @@ A Python implementation of the Hasse-Stirling computational framework for effici
 - Support for complex and hypercomplex (quaternionic/Clifford) parameter extensions (see `/complex-extension` and `/physics-applications`)
 - Operator tables and cheat sheets for rapid reference
 - Homework and educational modules for symmetry, self-adjointness, and physical interpretation
+
+## Documentation & Resources
+
+- **Mathematical explanation:** See `transform explained.md` for the operator definition, recurrence, and structural properties.
+- **Operator tables:** Quick reference in `/cheatsheet.md` and `/cheatsheet_condensed.md`.
+- **Examples:** Advanced applications in the `examples` directory.
+- **References:** `/docs/arXiv-1411.6271v1/GSN.bbl` and related literature.
+
+---
 
 ## Usage
 
@@ -53,6 +85,14 @@ See the `examples` directory for advanced applications, including Hurwitz zeta, 
 - For Hurwitz zeta with complex $s$, the operator can compute $(s-1)\zeta(s,x)$ via $\mathcal{H}_{\alpha,\beta,r}(x^{1-s})$.
 - Extensions to hypercomplex domains (quaternions, Clifford algebras) are possible and open new applications in physics and geometry.
 - The framework connects to Hermite polynomials, spectral theory, and quantum mechanics via symmetry and operator structure.
+
+## Next Steps
+
+- **Journal article:** Prepare a formal publication on the Hasse-Stirling Operator and its applications.
+- **LinkedIn post:** Share a summary and transform table to reach a broader audience.
+- **Wikipedia articles:** Draft entries to document the operator and its mathematical context.
+
+---
 
 ## References
 
