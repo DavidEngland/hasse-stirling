@@ -92,6 +92,24 @@ The framework extends to many other areas:
 - Multiple zeta values
 - Barnes G-function
 
+### 4.6 Atmospheric Boundary Layer (ABL)
+
+Targets:
+- Stability function: \(\phi(\zeta)=(1-\beta \zeta)^{-\alpha}=\exp(\alpha\,\mathrm{Li}_1(\beta \zeta))\).
+- Drag: \(C_D \sim [\kappa/(\ln((z-d)/z_0)-\psi_m(\zeta))]^2\).
+- Richardson numbers: gradient/bulk \(Ri\) with log-denominators and φ-modifiers.
+
+Hasse–Stirling contributions:
+- Fast, stable series with explicit error bounds for \(\phi\) (inner/outer and matched asymptotics), including analytic continuation handling the logarithmic branch.
+- Recurrence/caching of coefficients for repeated evaluation across many heights and times, accelerating \(C_D\) and \(Ri\) computations.
+- Bias-correction formulas when compressing multi-level winds to a representative height (beyond geometric-mean leading order).
+- Sensitivity/Jacobian generation for inference of \(z_0,d,\alpha,\beta\) (and \(\kappa\)) from profile/flux data.
+
+Integration path:
+- Precompute HS coefficient tables per stability class.
+- Use HS tail bounds to adapt truncation order to desired tolerance.
+- Embed in regression/inversion loops for robust parameter estimation.
+
 ## 5. Computational Advantages
 
 ### 5.1 Convergence Acceleration

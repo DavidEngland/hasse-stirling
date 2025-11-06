@@ -69,6 +69,22 @@ with \(H_{0,0}^{\alpha,\beta,r}=1\).
 
 ---
 
+## Applied example (ABL): Stability and Log-Law
+
+- Stability function: \(\phi(\zeta)=(1-\beta \zeta)^{-\alpha}=\exp(\alpha\,\mathrm{Li}_1(\beta \zeta))\) with \(\zeta=z/L\).
+  - HS excels at generating and summing log/polylog-powered series with controlled remainders; treat \(\mathrm{Li}_1\) expansions as HS-ready inputs.
+- Drag and Richardson: Quantities of the form \((\ln(\cdot)-\psi_m)^{-q}\) admit HS-derived series (in \(\zeta\), or deviations in \(\ln z\)) with:
+  - Recurrence-based coefficient production,
+  - Rigorous tail bounds from generalized Stirling growth,
+  - Stable evaluation near but outside the branch/singular layer.
+- Multi-level aggregation: HS finite-difference structure formalizes
+  \[
+  \frac{1}{N}\sum_i \ln(z_i)=\ln\big((\prod_i z_i)^{1/N}\big)
+  \]
+  and higher-order corrections, quantifying bias when compressing to a single “representative” height.
+
+---
+
 ✅ So you now have:
 - A **definition** via Stirling-type sums.
 - A **recurrence** for efficient computation.
