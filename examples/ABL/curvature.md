@@ -126,6 +126,29 @@ If \(\beta_h\neq\beta_m\) (e.g. \(\beta_h=16,\beta_m=14\)):
 \]
 Thus curvature is immediately determined once (\(\alpha,\beta\)) pair is fixed; only vertical coordinate change introduces the \(1/L^2\) scaling.
 
+## 15B. Quadratic SBL Truncation (Q‑SBL)
+A pole‑free stable‑regime surrogate that preserves neutral coefficients:
+- φ model:
+  \[
+  \phi_m^{Q}=1+a_m\zeta+b_m\zeta^2,\ \ \phi_h^{Q}=1+a_h\zeta+b_h\zeta^2,
+  \]
+  with
+  \[
+  a_{m,h}=\alpha_{m,h}\beta_{m,h},\quad b_{m,h}=\tfrac12\alpha_{m,h}(\alpha_{m,h}+1)\beta_{m,h}^2.
+  \]
+- Ri and curvature (cubic form):
+  \[
+  Ri_g^{Q}=\zeta+\Delta\zeta^2+\tfrac12(\Delta^2+c_1)\zeta^3,\quad
+  \partial_\zeta^2 Ri_g^{Q}=2\Delta+3(\Delta^2-c_1)\zeta,
+  \]
+  where \(\Delta=\alpha_h\beta_h-2\alpha_m\beta_m,\ c_1=\alpha_h\beta_h^2-2\alpha_m\beta_m^2\).
+
+Use on ζ∈[0,ζ_max] with ζ_max≈0.2–0.5; enforce monotone/convex behavior via a_{m,h},b_{m,h}≥0 and (optionally) a linear cap \(\phi\le 1+c\,\zeta\) (e.g., c≈5). Blend with the exact power law for ζ≤ζ_b to maintain continuity.
+
+Implementation note
+- Height‑coordinate curvature: ∂^2/∂z^2=(1/L^2)∂^2/∂ζ^2.
+- This Q‑SBL matches neutral slope/curvature and avoids the finite‑height pole, stabilizing SBL integrations.
+
 ## 16. Enhanced MOST / Ri Function Candidates (Implementation Focus)
 | Tag | Form | Purpose |
 |-----|------|---------|
@@ -178,3 +201,40 @@ Quick constants set (examples)
 Actionables
 - Build planet packs (g, R, c_p, θ_v composition) and re‑run curvature spectra.
 - Prototype MHD toy layers to test “curvature” classifiers vs. (Ro,E,Λ).
+
+## 19. Multi‑Profile Pack (Reusable Curvature Recipe)
+General recipe (any φ)
+\[
+F=\phi_h/\phi_m^2,\quad V_{\log}=(\phi_h'/\phi_h)-2(\phi_m'/\phi_m),\quad
+W_{\log}=dV_{\log}/d\zeta,\quad
+\partial_\zeta^2 Ri_g = F[2V_{\log}+\zeta(V_{\log}^2-W_{\log})].
+\]
+
+Profiles to test (examples; fit coefficients to site/LES)
+- Power‑law (Businger–Dyer baseline).
+- Quadratic stable (Q‑SBL) with optional cap (Section 15B).
+- Cheng–Brutsaert‑style: \(\phi_{m,h}=(1+\gamma_{m,h}|\zeta|)^{p_{m,h}}\).
+- Dynamic‑Prandtl: pick \(\phi_m\) baseline, then \(\phi_h=Pr_t\phi_m\) with \(Pr_t=1+a_1 Ri+a_2 Ri^2\).
+
+Pluggable skeleton
+```python
+def make_profile(tag, pars):
+    if tag=='BD':  # power-law
+        am, bm, ah, bh = pars['am'], pars['bm'], pars['ah'], pars['bh']
+        return (lambda z: (1-bm*z)**(-am),
+                lambda z: (1-bh*z)**(-ah))
+    if tag=='QSBL':
+        am,bm,ah,bh = pars['am'],pars['bm'],pars['ah'],pars['bh']
+        return (lambda z: 1+am*z+bm*z*z,
+                lambda z: 1+ah*z+bh*z*z)
+    if tag=='CB':  # Cheng–Brutsaert-type
+        gm,pm,gh,ph = pars['gm'],pars['pm'],pars['gh'],pars['ph']
+        return (lambda z: (1+gm*abs(z))**pm,
+                lambda z: (1+gh*abs(z))**ph)
+    raise ValueError('unknown profile')
+```
+
+Comparison workflow
+- Calibrate neutral coefficients (Δ, c1) for each profile.
+- Reuse Sections 4–8 and 11 for series, inflection, error control, height scaling.
+- Plot normalized curvature ratio \(\mathcal{C}(\zeta)\) to compare early‑ζ behavior.

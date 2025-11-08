@@ -126,5 +126,17 @@ Tasks
 - Prototype curvature‑style classifiers on synthetic rotating‑MHD shear layers; sensitivity to Ro, E, Λ.
 - Cross‑calibrate with observed gravity/magnetic trends to bound parameter ranges.
 
+## 15. Multi‑Profile Comparison (3–4 Families)
+Goal: repeat the curvature analysis for several φ families using the same diagnostics.
+
+Suggested set
+- BD (power‑law), QSBL (quadratic stable), CB‑type (pole‑free), DTP (dynamic Prandtl on top of a base φ_m).
+
+Steps
+1) Implement φ_m, φ_h callables per profile.
+2) Use the generic curvature evaluator (Section 3/8 here; Sections 25/19 in the math docs).
+3) Report: neutral curvature 2Δ, first inflection (if any), ζ range used, and ∂²Ri_g/∂z² at a reference height (via 1/L²).
+4) Plot normalized curvature \(\mathcal{C}(\zeta)\) for side‑by‑side comparison.
+
 ---
 This README focuses on practical boundary-layer use. Advanced operator / Hasse–Stirling derivations are documented in the main framework file.

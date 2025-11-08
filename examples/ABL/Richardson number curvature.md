@@ -404,3 +404,139 @@ Planet notes
 - Mars (low g): larger |ζ| windows; dust radiative coupling alters θ′ budgets—treat L with radiative‑corrected heat flux.
 - Venus (dense CO₂): small L near surface ⇒ amplified \(\partial_z^2 Ri_g\).
 - Titan: redefine θ_v with methane; recompute Δ,c₁ and neutral curvature.
+
+## 24. Quadratic SBL Truncation (Q‑SBL)
+Goal: a pole‑free stable‑regime approximation for ζ>0 that preserves neutral slope/curvature and remains well‑behaved for large ζ.
+
+Quadratic φ model (stable ζ≥0):
+\[
+\phi_m^{Q}(\zeta)=1+a_m\zeta+b_m\zeta^2,\qquad
+\phi_h^{Q}(\zeta)=1+a_h\zeta+b_h\zeta^2,
+\]
+with coefficients mapped from power‑law MOST so that near‑neutral behavior is matched:
+\[
+a_m=\alpha_m\beta_m,\quad b_m=\tfrac12\alpha_m(\alpha_m+1)\beta_m^2,\qquad
+a_h=\alpha_h\beta_h,\quad b_h=\tfrac12\alpha_h(\alpha_h+1)\beta_h^2.
+\]
+
+Resulting ratio and Ri_g to O(ζ^2/O(ζ^3)):
+- Using the known series (already derived above),
+\[
+F(\zeta)=\frac{\phi_h}{\phi_m^2}\approx 1+\Delta\,\zeta+\tfrac12(\Delta^2+c_1)\zeta^2,
+\]
+\[
+Ri_g^{Q}(\zeta)=\zeta\,F(\zeta)=\zeta+\Delta\zeta^2+\tfrac12(\Delta^2+c_1)\zeta^3,
+\]
+with
+\[
+\Delta=\alpha_h\beta_h-2\alpha_m\beta_m,\quad c_1=\alpha_h\beta_h^2-2\alpha_m\beta_m^2.
+\]
+
+Curvature (exact for the cubic Ri_g^Q):
+\[
+\frac{d^2 Ri_g^{Q}}{d\zeta^2}=2\Delta+3(\Delta^2-c_1)\,\zeta.
+\]
+Height‑coordinate curvature: ∂^2/∂z^2=(1/L^2)∂^2/∂ζ^2.
+
+Domain and guards (stable SBL):
+- Use on 0\le \zeta \le \zeta_{\max}, with \zeta_{\max}\in[0.2,\,0.5] (site dependent).
+- Monotonic/convex stability: choose (a_{m,h}\ge0, b_{m,h}\ge0); optionally cap φ growth for extreme stability:
+  \[
+  \phi_{m,h}^{Q,\text{cap}}(\zeta)=\min\big(\phi_{m,h}^{Q}(\zeta),\,1+c_{m,h}\zeta\big)
+  \]
+  with c_{m}\approx c_{h}\approx 5 as a conservative linear cap (Businger–Dyer style).
+- Blending (optional) for C^0 continuity:
+  \[
+  \phi_{(\cdot)}(\zeta)=
+  \begin{cases}
+  \phi_{(\cdot)}^{\text{power}}(\zeta), & \zeta\le \zeta_b,\\
+  \phi_{(\cdot)}^{Q}(\zeta), & \zeta_b<\zeta\le \zeta_{\max},
+  \end{cases}
+  \]
+  with small \(\zeta_b\sim 0.05\); both agree up to O(ζ^2) so mismatch is minimal.
+
+Minimal code sketch (stable ζ):
+```python
+# Q-SBL phi and Ri_g/curvature (ζ≥0), with clamp
+def qsbl_coeffs(alpha_m, beta_m, alpha_h, beta_h):
+    am = alpha_m*beta_m
+    bm = 0.5*alpha_m*(alpha_m+1)*beta_m**2
+    ah = alpha_h*beta_h
+    bh = 0.5*alpha_h*(alpha_h+1)*beta_h**2
+    Delta = ah - 2*am
+    c1 = beta_h**2*alpha_h - 2*beta_m**2*alpha_m
+    return am,bm,ah,bh,Delta,c1
+
+def phi_qsbl(zeta, a, b, zeta_max=0.5, cap_c=None):
+    z = min(max(zeta, 0.0), zeta_max)
+    val = 1.0 + a*z + b*z*z
+    if cap_c is not None:
+        val = min(val, 1.0 + cap_c*z)  # optional linear cap
+    return val
+
+def rig_qsbl(zeta, Delta, c1, zeta_max=0.5):
+    z = min(max(zeta, 0.0), zeta_max)
+    # cubic Ri_g with matched neutral slope/curvature
+    Ri = z + Delta*z*z + 0.5*(Delta*Delta + c1)*z*z*z
+    curv = 2.0*Delta + 3.0*(Delta*Delta - c1)*z
+    return Ri, curv
+```
+
+When z/L » 0 (very stable), prefer the capped quadratic or switch to a prescribed asymptote to avoid excessive growth while maintaining positive φ and realistic Ri classification.
+
+## 25. Multi‑Profile Extension: Recipe and Candidate φ Sets
+The curvature expression
+\[
+\partial_\zeta^2 Ri_g = F\,[2V_{\log}+\zeta(V_{\log}^2-W_{\log})],\quad
+F=\frac{\phi_h}{\phi_m^2}
+\]
+holds for any differentiable \(\phi_{m,h}(\zeta)\) in the MOST class. To repeat the analysis for other profiles, define:
+\[
+V_{\log}=\frac{1}{\phi_h}\phi_h' - 2\frac{1}{\phi_m}\phi_m',\qquad
+W_{\log}=\frac{dV_{\log}}{d\zeta}.
+\]
+Then reuse all neutral limits, series, inversion, and sensitivity steps by substituting the new \(\phi_{m,h}\).
+
+Candidate profiles (examples)
+- Power‑law (Businger–Dyer; baseline, already derived)
+  - Stable/unstable via signs in ζ:
+    \(\phi_m=(1-\beta_m\zeta)^{-\alpha_m},\ \phi_h=(1-\beta_h\zeta)^{-\alpha_h}\).
+- Beljaars–Holtslag (stable surrogate)
+  - Typical polynomial/rational stable forms (site‑tuned):
+    \(\phi_m=1+a_m\zeta+b_m\zeta^2,\ \phi_h=1+a_h\zeta+b_h\zeta^2\) (Q‑SBL already included); or capped linear variants.
+- Cheng–Brutsaert (all‑stability, monotone, pole‑free)
+  - Example pattern (parameters to be fit):
+    \(\phi_m=(1+\gamma_m |\zeta|)^{p_m},\ \phi_h=(1+\gamma_h |\zeta|)^{p_h}\).
+- Grachev–Fairall (very stable tail)
+  - Use enhanced Prandtl: \(Pr_t=1+c_1 Ri + c_2 Ri^2\), then \(\phi_h=Pr_t\,\phi_m\) with \(\phi_m\) from chosen base.
+
+Procedure (per profile)
+1) Specify \(\phi_{m,h}(\zeta)\), compute \(\phi'_{m,h}\) and \(V_{\log}, W_{\log}\).
+2) Evaluate neutral coefficients: \(\Delta=V_{\log}(0)\), \(c_1=W_{\log}(0)\) → neutral curvature \(2\Delta\), cubic term via \(\Delta^2\pm c_1\).
+3) Reuse sections 5, 11, 12–16 for series, chain rule to z, inflection, inversion ζ(Ri), and diagnostics.
+4) Validate against the same acceptance band for ζ and report the same minimal set (neutral curvature, first inflection, series inversion).
+
+Pluggable evaluation sketch
+```python
+# given callable phi_m(zeta), phi_h(zeta)
+def rig_curvature_generic(zeta, phi_m, phi_h, L):
+    pm = phi_m(zeta); ph = phi_h(zeta)
+    # numerical or analytic derivatives; here 2-sided finite-diff as placeholder
+    dz = 1e-6
+    dpm = (phi_m(zeta+dz)-phi_m(zeta-dz))/(2*dz)
+    dph = (phi_h(zeta+dz)-phi_h(zeta-dz))/(2*dz)
+    Vlog = (dph/ph) - 2*(dpm/pm)
+    # W_log via diff of Vlog
+    Vp = ((phi_h(zeta+dz+dz)-phi_h(zeta+dz-dz))/(2*dz))/phi_h(zeta+dz) \
+         - 2*((phi_m(zeta+dz+dz)-phi_m(zeta+dz-dz))/(2*dz))/phi_m(zeta+dz)
+    Vm = ((phi_h(zeta-dz+dz)-phi_h(zeta-dz-dz))/(2*dz))/phi_h(zeta-dz) \
+         - 2*((phi_m(zeta-dz+dz)-phi_m(zeta-dz-dz))/(2*dz))/phi_m(zeta-dz)
+    Wlog = (Vp - Vm)/(2*dz)
+    F = ph/(pm*pm)
+    curv_zeta = F*(2*Vlog + zeta*(Vlog*Vlog - Wlog))
+    return curv_zeta, curv_zeta/(L*L)
+```
+
+Reporting
+- Keep the same neutral/inflection/series inversion outputs to compare profiles on equal footing.
+- For bounded/pole‑free families, document ζ_max used and any capping/blending applied.

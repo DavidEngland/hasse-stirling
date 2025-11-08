@@ -94,3 +94,18 @@ Module will expose: curvature(ζ, params), invert_Ri(Ri, params), error_bound(ζ
 
 ## 10. Summary to Reviewers
 The curvature expression is *not* a cosmetic derivative; it is the enabling analytic ingredient for consistent Ri-based closure on coarse grids, with quantifiable accuracy and stability controls.
+
+# Response to Reviewer Comments — References to Equations (21), (22), and Parameters
+
+Citations
+- Eq. (21): see Appendix paste target in JAMC_format_Grid_Dependence_V15_10-31-2025.md.
+- Eq. (22): see Appendix paste target in JAMC_format_Grid_Dependence_V15_10-31-2025.md.
+- Parameter table: see Appendix table in JAMC_format_Grid_Dependence_V15_10-31-2025.md.
+
+Once pasted, cross-reference here with equation numbers and parameter names to support the responses.
+
+# Response to Reviewer Comments (Placeholder)
+
+- We added a multi‑profile curvature analysis (BD, QSBL, CB‑type, DTP). All use the same closed curvature form via V_log and W_log.
+- New reporting includes neutral curvature (2Δ), inflection height, ζ‑range, and physical curvature via 1/L².
+- Grid‑dependence section repeats the tests for each profile with consistent metrics.
