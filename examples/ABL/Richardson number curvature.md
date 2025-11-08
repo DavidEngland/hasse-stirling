@@ -1,0 +1,406 @@
+# Curvature of the Gradient Richardson Number \(Ri_g\)
+
+> Note on z vs. ζ: We ultimately need the curvature with respect to height z, ∂²Ri_g/∂z². We compute analytically in the nondimensional coordinate ζ=z/L, then convert at the end via the chain rule: ∂²/∂z² = (1/L²) ∂²/∂ζ² (treating L locally constant in the surface layer).
+
+## 1. Purpose
+Provide a clean, citation‑ready derivation and interpretation of \(\partial^{2}Ri_g/\partial \zeta^{2}\) for power‑law MOST stability functions to support discussion (McNider, Biazar).
+
+## 2. Definitions
+Dimensionless height: \(\zeta = z/L\).
+
+Stability (momentum, heat):
+\[
+\phi_m(\zeta)=(1-\beta_m \zeta)^{-\alpha_m},\qquad
+\phi_h(\zeta)=(1-\beta_h \zeta)^{-\alpha_h},
+\quad (1-\beta_{(\cdot)}\zeta)>0.
+\]
+
+Gradient Richardson number (MOST form):
+\[
+Ri_g(\zeta)=\zeta\,\frac{\phi_h(\zeta)}{\phi_m(\zeta)^2}=\zeta\,F(\zeta),
+\qquad
+F(\zeta)= (1-\beta_h \zeta)^{-\alpha_h}(1-\beta_m \zeta)^{2\alpha_m}.
+\]
+
+Logarithmic derivative components:
+\[
+V_{\log}=\frac{1}{\phi_h}\frac{d\phi_h}{d\zeta}-\frac{2}{\phi_m}\frac{d\phi_m}{d\zeta}
+=\frac{\alpha_h\beta_h}{1-\beta_h\zeta}-\frac{2\alpha_m\beta_m}{1-\beta_m\zeta},
+\]
+\[
+W_{\log}=\frac{d}{d\zeta}V_{\log}
+=\frac{\alpha_h\beta_h^{2}}{(1-\beta_h\zeta)^2}-\frac{2\alpha_m\beta_m^{2}}{(1-\beta_m\zeta)^2}.
+\]
+
+Useful identity:
+\[
+\frac{1}{\phi}\frac{d\phi}{d\zeta}=\frac{\alpha\beta}{1-\beta\zeta}\quad\text{for}\quad \phi=(1-\beta\zeta)^{-\alpha}.
+\]
+
+## 3. Curvature Derivation
+Starting from \(Ri_g=\zeta F\):
+\[
+\frac{dRi_g}{d\zeta}=F+\zeta F',\qquad
+\frac{d^{2}Ri_g}{d\zeta^{2}}=2F'+\zeta F''.
+\]
+
+With
+\[
+\frac{F'}{F}=V_{\log},\qquad
+\frac{F''}{F}=V_{\log}^2-W_{\log},
+\]
+we obtain the compact curvature form:
+\[
+\boxed{\frac{d^{2}Ri_g}{d\zeta^{2}}=F(\zeta)\big[2V_{\log}+\zeta(V_{\log}^{2}-W_{\log})\big]}.
+\]
+
+Expanded (self‑contained) form:
+\[
+\frac{d^{2}Ri_g}{d\zeta^{2}}=
+(1-\beta_h \zeta)^{-\alpha_h}(1-\beta_m \zeta)^{2\alpha_m}
+\left\{
+\frac{2\alpha_h\beta_h}{1-\beta_h\zeta}
+-\frac{4\alpha_m\beta_m}{1-\beta_m\zeta}
++\zeta\left[
+\left(\frac{\alpha_h\beta_h}{1-\beta_h\zeta}-\frac{2\alpha_m\beta_m}{1-\beta_m\zeta}\right)^2
+-\left(\frac{\alpha_h\beta_h^{2}}{(1-\beta_h\zeta)^2}-\frac{2\alpha_m\beta_m^{2}}{(1-\beta_m\zeta)^2}\right)
+\right]
+\right\}.
+\]
+
+## 4. Neutral Limit (\(\zeta\to 0\))
+\[
+F(0)=1,\quad V_{\log}(0)=\alpha_h\beta_h-2\alpha_m\beta_m,\quad
+W_{\log}(0)=\alpha_h\beta_h^{2}-2\alpha_m\beta_m^{2},
+\]
+\[
+\left.\frac{d^{2}Ri_g}{d\zeta^{2}}\right|_{0}=2(\alpha_h\beta_h-2\alpha_m\beta_m).
+\]
+
+Interpretation:
+- Positive: initial concave‑up \(Ri_g(\zeta)\) (heat “more corrected”).
+- Negative: concave‑down (momentum “more corrected”).
+- Near zero: quasi‑linear onset of \(Ri_g\).
+
+## 5. Small-\(\zeta\) Series (optional)
+Expand logs:
+\[
+\ln F(\zeta)= (\alpha_h\beta_h-2\alpha_m\beta_m)\zeta
++\tfrac{1}{2}(\alpha_h\beta_h^{2}-2\alpha_m\beta_m^{2})\zeta^{2}+O(\zeta^{3}).
+\]
+Then
+\[
+F(\zeta)=1+A_1\zeta+\tfrac{1}{2}(A_2+A_1^{2})\zeta^{2}+O(\zeta^{3}),
+\quad A_1=\alpha_h\beta_h-2\alpha_m\beta_m,\ A_2=\alpha_h\beta_h^{2}-2\alpha_m\beta_m^{2}.
+\]
+So
+\[
+Ri_g(\zeta)=\zeta + A_1\zeta^{2} + O(\zeta^{3}),\qquad
+\frac{d^{2}Ri_g}{d\zeta^{2}}=2A_1+O(\zeta).
+\]
+
+## 6. Singular / Domain Behavior
+Poles at \(\zeta=1/\beta_h\) and \(\zeta=1/\beta_m\). As either is approached from below:
+\[
+V_{\log}\sim \frac{\alpha\beta}{1-\beta\zeta},\qquad
+W_{\log}\sim \frac{\alpha\beta^{2}}{(1-\beta\zeta)^2},
+\]
+giving algebraic blow‑up; practical filtering typically restricts \(\zeta<0.7/\max(\beta_h,\beta_m)\).
+
+## 7. Parameter Sensitivity (local)
+\[
+\frac{\partial}{\partial \alpha_h}\left(\frac{d^{2}Ri_g}{d\zeta^{2}}\right)=
+\frac{d^{2}Ri_g}{d\zeta^{2}}\left[-\ln(1-\beta_h\zeta)+\frac{2}{2V_{\log}+\zeta(V_{\log}^2-W_{\log})}
+\left(\frac{\beta_h}{1-\beta_h\zeta}+\frac{\zeta\beta_h}{1-\beta_h\zeta}V_{\log}-\frac{\zeta\beta_h^{2}}{(1-\beta_h\zeta)^2}\right)\right]
+\]
+(similar forms for \(\alpha_m,\beta_h,\beta_m\); retained symbolically to avoid clutter—can be expanded if needed).
+
+Qualitatively: curvature most sensitive when denominators \(1-\beta_{(\cdot)}\zeta\) shrink (near singular approach) and when \(2\alpha_m\beta_m\) and \(\alpha_h\beta_h\) nearly cancel (magnifying relative uncertainty).
+
+## 8. Recommended Reporting Set
+For comparison across parameterizations:
+- \(\left.d^{2}Ri_g/d\zeta^{2}\right|_{\zeta=0}\)
+- Height of curvature sign change (if any).
+- Fractional enhancement factor:
+  \[
+  \mathcal{C}(\zeta)=\frac{(d^{2}Ri_g/d\zeta^{2})}{2(\alpha_h\beta_h-2\alpha_m\beta_m)}.
+  \]
+
+## 9. Summary (for distribution)
+A single, closed expression:
+\[
+\frac{d^{2}Ri_g}{d\zeta^{2}}=F(\zeta)\big[2V_{\log}+\zeta(V_{\log}^{2}-W_{\log})\big]
+\]
+encapsulates curvature; neutral limit depends only on the *linear* stability coefficients \(\alpha\beta\). Sign of \(\alpha_h\beta_h-2\alpha_m\beta_m\) determines initial concavity; proximity to singular factors drives rapid growth and parameter sensitivity. Series and sensitivity forms enable controlled inversion / fitting; suitable for manuscript discussion.
+
+## 10. Action Items (next discussion)
+- Confirm parameter ranges (site data) ⇒ evaluate neutral curvature spectrum.
+- Decide acceptance band for \(\zeta\) before curvature saturation.
+- Assess whether curvature sign change correlates with empirical \(Ri_c\).
+- Prepare figure set: (i) curvature vs. \(\zeta\); (ii) normalized \(\mathcal{C}(\zeta)\); (iii) sensitivity heat map.
+
+## 11. Physical Height Curvature (chain rule)
+Using ζ=z/L and treating L locally constant over the layer of interest,
+\[
+\boxed{\frac{\partial^{2}Ri_g}{\partial z^{2}}=\frac{1}{L^{2}}\;\frac{\partial^{2}Ri_g}{\partial \zeta^{2}}.}
+\]
+If L varies with height and that variation is retained, additional terms involving dL/dz appear; in MOST applications we evaluate curvature at a level using the local L, so the 1/L² factor is appropriate.
+
+## 12. Dimensionless Control Parameters and Inflection Structure
+Define
+\[
+G=\frac{\alpha_h\beta_h}{2\alpha_m\beta_m},\qquad \Delta = \alpha_h\beta_h-2\alpha_m\beta_m=2\alpha_m\beta_m(G-1).
+\]
+Neutral curvature sign depends only on \(\Delta\). A (positive) interior inflection satisfies
+\[
+2V_{\log}+\zeta(V_{\log}^2-W_{\log})=0.
+\]
+Near neutrality (\(|\zeta|\ll1\)) expand \(V_{\log}= \Delta + c_1\zeta + O(\zeta^2)\) with
+\[
+c_1=\alpha_h\beta_h^2-2\alpha_m\beta_m^2 = W_{\log}(0).
+\]
+Retaining leading orders gives a quadratic approximation for the first root (if \(\Delta c_1<0\)):
+\[
+\zeta_{\text{inf}} \approx -\frac{2\Delta}{\Delta^2-c_1}.
+\]
+Validity requires \(|\zeta_{\text{inf}}|\ll \min(1/\beta_h,1/\beta_m)\); otherwise curvature is monotone up to singular approach.
+
+## 13. Higher Derivatives
+With \(Ri_g=\zeta F\),
+\[
+\frac{d^3Ri_g}{d\zeta^3}=3F''+\zeta F'''.
+\]
+Using logarithmic derivatives:
+\[
+\frac{F'''}{F}=V_{\log}^3-3V_{\log}W_{\log}-\frac{dW_{\log}}{d\zeta},
+\quad
+\frac{dW_{\log}}{d\zeta}= \frac{2\alpha_h\beta_h^3}{(1-\beta_h\zeta)^3}-\frac{4\alpha_m\beta_m^3}{(1-\beta_m\zeta)^3}.
+\]
+Thus
+\[
+\frac{d^3Ri_g}{d\zeta^3}=F\Big[3(V_{\log}^2-W_{\log}) + \zeta\big(V_{\log}^3-3V_{\log}W_{\log}-\tfrac{dW_{\log}}{d\zeta}\big)\Big].
+\]
+Neutral limit:
+\[
+\left.\frac{d^3Ri_g}{d\zeta^3}\right|_{0}=3(\Delta^2-c_1).
+\]
+Hence the sign of \(\Delta^2-c_1\) controls initial *change* of curvature magnitude.
+
+## 14. Inversion: \(\zeta(Ri_g)\) Near Neutrality
+Set \(Ri_g=\zeta(1+A_1\zeta+A_2'\zeta^2+O(\zeta^3))\) with
+\[
+A_1=A_1^{(0)}=\Delta,\qquad A_2'=\tfrac12\big(A_2+A_1^2\big)=\tfrac12\left(c_1+\Delta^2\right).
+\]
+Series inversion gives
+\[
+\zeta = Ri_g - A_1 Ri_g^2 + (2A_1^2-A_2')Ri_g^3 + O(Ri_g^4),
+\]
+i.e.
+\[
+\zeta = Ri_g - \Delta Ri_g^2 + \left(\tfrac32\Delta^2-\tfrac12 c_1\right)Ri_g^3+O(Ri_g^4).
+\]
+This expansion is needed to construct *Ri*-based shear functions without iterative ζ-solvers.
+
+## 15. Turbulent Prandtl Number and Curvature
+\[
+Pr_t=\frac{\phi_h}{\phi_m} = (1-\beta_h\zeta)^{-\alpha_h}(1-\beta_m\zeta)^{\alpha_m}.
+\]
+Log derivative:
+\[
+\frac{1}{Pr_t}\frac{dPr_t}{d\zeta}= \frac{\alpha_h\beta_h}{1-\beta_h\zeta}-\frac{\alpha_m\beta_m}{1-\beta_m\zeta}.
+\]
+Near neutrality,
+\[
+Pr_t(\zeta)=1+(\alpha_h\beta_h-\alpha_m\beta_m)\zeta+O(\zeta^2).
+\]
+Note
+\[
+\Delta=(\alpha_h\beta_h-\alpha_m\beta_m)-(\alpha_m\beta_m).
+\]
+Thus deviation of \(Pr_t\) from unity partitions \(\Delta\) into a *Prandtl* component and a *momentum‑only* residual; curvature neutrality (\(\Delta=0\)) does not require \(Pr_t=1\).
+
+## 16. Flux Richardson Number \(R_f\)
+For MOST:
+\[
+R_f = \frac{-\zeta}{\phi_m^2/\phi_h}= \frac{-\zeta}{F(\zeta)}.
+\]
+Hence
+\[
+Ri_g = -R_f F(\zeta)^2.
+\]
+Near neutrality \(F\simeq 1+\Delta\zeta\); eliminating \(\zeta\) by inversion:
+\[
+R_f \simeq -Ri_g \left[1-2\Delta Ri_g + O(Ri_g^2)\right].
+\]
+Thus the *ratio* \(Ri_g/R_f \to -1\) with linear correction \(2\Delta Ri_g\).
+
+## 17. Singular Asymptotics
+As \(\zeta\to \zeta_h^-=1/\beta_h\) (heat singular first, if \(\beta_h>\beta_m\)):
+\[
+\phi_h\sim (\beta_h(\zeta_h-\zeta))^{-\alpha_h},\quad
+F \sim (\beta_h(\zeta_h-\zeta))^{-\alpha_h}(1-\beta_m\zeta_h)^{2\alpha_m},
+\]
+\[
+V_{\log}\sim \frac{\alpha_h}{\zeta_h-\zeta},\quad
+W_{\log}\sim \frac{\alpha_h}{(\zeta_h-\zeta)^2}.
+\]
+Hence
+\[
+\frac{d^{2}Ri_g}{d\zeta^{2}} \sim (\beta_h(\zeta_h-\zeta))^{-\alpha_h}(1-\beta_m\zeta_h)^{2\alpha_m}
+\left[
+\frac{2\alpha_h}{\zeta_h-\zeta} + O(1)
+\right]
+\]
+→ algebraic blow‑up exponent \(\alpha_h+1\). Provides *a priori* filter threshold for numerical stability.
+
+## 18. Uniform Composite Approximation (Two-Term)
+Define outer (regular) part \(Ri^{(o)}(\zeta)=\zeta(1+\Delta \zeta)\), inner stretched coordinate near singular heat pole: \(\eta=\frac{\zeta_h-\zeta}{\zeta_h}\). Inner form:
+\[
+Ri^{(i)}(\eta) \sim \zeta_h (1-\eta) (\beta_h\zeta_h \eta)^{-\alpha_h}C_m,
+\quad C_m=(1-\beta_m\zeta_h)^{2\alpha_m}.
+\]
+Uniform (first order):
+\[
+Ri_g^{(u)}(\zeta)= Ri^{(o)} + Ri^{(i)} - \text{overlap},\quad \text{overlap} \sim \zeta_h\,( \beta_h\zeta_h)^{-\alpha_h} C_m.
+\]
+Improves analytic continuation toward large ζ without direct evaluation near singular point.
+
+## 19. Error Bounds for Binomial / Curvature Series
+Binomial remainder for \((1-\beta\zeta)^{-\alpha}=\sum_{n=0}^{N} \binom{\alpha+n-1}{n} (\beta\zeta)^n + R_{N+1}\).
+With \(|\beta\zeta|<1\),
+\[
+|R_{N+1}|\le \binom{\alpha+N}{N+1} \frac{|\beta\zeta|^{N+1}}{(1-|\beta\zeta|)^{\alpha+N+1}}.
+\]
+Propagating to curvature (linear combination of products and rational factors) yields practical truncation target
+\[
+N \gtrsim \frac{\log(\varepsilon)}{\log|\beta \zeta|}-1,
+\]
+for tolerance \(\varepsilon\), provided \(|\beta\zeta|<\rho<1\). Use the *larger* of \(\beta_h,\beta_m\) for conservative choice.
+
+## 20. Algorithmic Notes (Model Implementation)
+1. Precompute \(\Delta, c_1\) for parameter set.
+2. Use neutral series up to desired order if \(|\zeta|<\zeta_{th}\) (e.g. 0.05).
+3. Else evaluate exact rational/log form guarding \(1-\beta_{(\cdot)}\zeta\).
+4. Optional: If \(\Delta c_1<0\) and predicted \(\zeta_{\text{inf}}\) within layer, tabulate sign change height for diagnostic output.
+5. For Ri → ζ mapping in Ri-based closures employ 3rd-order inversion above; refine by single Newton step on \(Ri_g(\zeta)-Ri_{target}=0\).
+
+## 21. Summary Table (Key Neutral Coefficients)
+\[
+\begin{array}{l|l}
+\text{Quantity} & \text{Neutral Value} \\
+\hline
+Ri_g/\zeta & 1 \\
+\partial_\zeta^2 Ri_g & 2\Delta \\
+\partial_\zeta^3 Ri_g & 3(\Delta^2-c_1) \\
+Pr_t & 1 \\
+\partial_\zeta Pr_t & (\alpha_h\beta_h-\alpha_m\beta_m) \\
+Ri_g/R_f & -1 \\
+\end{array}
+\]
+
+These coefficients give direct calibration handles for assessing parameter plausibility against high-resolution or LES diagnostics.
+
+## 21A. Parameter Selection and Curvature Scaling
+Typical MOST fits: \(\alpha_{m,h}\approx 0.45\text{–}0.55\), \(\beta_{m,h}\approx 14\text{–}16\).
+Neutral curvature depends only on \(\Delta=\alpha_h\beta_h-2\alpha_m\beta_m\).
+Example (symmetric choice): \(\alpha_m=\alpha_h=0.5,\ \beta_m=\beta_h=16\):
+\[
+\Delta=0.5\cdot 16 -2(0.5\cdot16)=8-16=-8,\qquad
+\left.\partial_{\zeta}^2 Ri_g\right|_{0}=2\Delta=-16.
+\]
+Sign: negative ⇒ initial concave‑down (momentum corrections dominate).
+Domain constraint: \(1-\beta\zeta>0\Rightarrow \zeta<1/\beta\approx 0.0625\); large \(\beta\) compresses usable ζ range while amplifying \(|\Delta|\).
+Height curvature adds \(1/L^{2}\):
+\[
+\left.\partial_{z}^2 Ri_g\right|_{0}=\frac{-16}{L^{2}}.
+\]
+If \(\beta_h\neq\beta_m\), adjust: \(\Delta=\alpha_h\beta_h-2\alpha_m\beta_m\) (one large \(\beta\) can flip sign).
+Series validity: with \(\rho=\max(\beta_m,\beta_h)\zeta\), choose ζ so \(\rho<0.9\) for tight error bounds; at \(\beta=16,\ \zeta=0.02\Rightarrow \rho=0.32\) small ⇒ rapid convergence.
+Relative neutral curvature magnitude scales linearly with chosen \(\beta\); picking \(\beta=16\) yields integer-friendly coefficients in binomial expansion indexes.
+
+Error bound (neutral series truncation after N terms, \(\rho<1\)):
+\[
+|R_{N+1}|\lesssim \frac{\rho^{N+1}}{(N+1)(1-\rho)}.
+\]
+
+## 22. Enhanced MOST / Ri Formulations (Model-Oriented)
+Targets: remove singularities, enable Ri-based closure, incorporate nonlocal effects, stabilize curvature.
+
+1. Regularized power law (RPL):
+\[
+\phi=(1+\gamma(\beta\zeta))^{\alpha},\quad \gamma(x)=\frac{x}{1+\delta x},\;\delta>0.
+\]
+
+2. Variable exponent (VEXP):
+\[
+\phi_m=(1-\beta_m\zeta)^{-\alpha_m(1+\eta_m\zeta)},\;
+\phi_h=(1-\beta_h\zeta)^{-\alpha_h(1+\eta_h\zeta)}.
+\]
+
+3. Ri-conditioned blend (RB):
+\[
+\phi_m^{RB}=\phi_m(1-\chi)+\phi_m^{\infty}\chi,\quad
+\chi(Ri)=\frac{Ri^p}{Ri^p+Ri_c^p}.
+\]
+
+4. Dynamic turbulent Prandtl:
+\[
+Pr_t=1+a_1 Ri + a_2 Ri^2,\;\phi_h=Pr_t\phi_m.
+\]
+
+5. Nonlocal augmentation:
+\[
+\phi_{m,h}^{NLM}=\phi_{m,h}\left(1+c_{m,h}\frac{z}{h_{mix}}\right).
+\]
+
+6. Curvature guard:
+\[
+\phi_{m,h}^{guard}=\frac{\phi_{m,h}}{1+\epsilon_{m,h}|\zeta^2 \partial_\zeta^2 Ri_g|}.
+\]
+
+7. Unified Ri closure:
+\[
+f_m(Ri)=\left(1+b_m\frac{Ri}{Ri_c}\right)^{-e_m},\; e_m=\frac{\alpha_m}{2\alpha_m-\alpha_h}.
+\]
+
+Pseudocode sketch:
+```python
+def stability_functions(zeta, p):
+    if p.model=='RPL':
+        g=(p.beta*zeta)/(1+p.delta*p.beta*zeta)
+        return (1+g)**p.alpha
+    elif p.model=='VEXP':
+        return (1-p.beta*zeta)**(-p.alpha*(1+p.eta*zeta))
+    # ...
+```
+
+Calibration steps:
+- Fit neutral curvature and Pr_t slope.
+- Enforce smooth $\partial_\zeta^2 Ri_g$ profile.
+- Constrain high-Ri asymptote to LES/tower regime statistics.
+- Validate inversion Ri ↔ ζ against power-law baseline.
+
+Expected gains: fewer time-step restrictions (pole removed), reduced premature flux collapse in stable BL, more accurate Ri classification over coarse grids.
+
+## 23. Appendix—Planetary Scaling and Polar Use
+What changes off‑Earth
+- Curvature form in ζ is unchanged:
+  \[
+  \partial_\zeta^2 Ri_g = F[2V_{\log}+\zeta(V_{\log}^2-W_{\log})].
+  \]
+- Physical curvature scales as
+  \[
+  \partial_z^2 Ri_g=\frac{1}{L^2}\partial_\zeta^2 Ri_g,\quad
+  L=-\frac{u_*^3\,\theta_{\mathrm{ref}}}{\kappa\,g\,w'\theta'_v}.
+  \]
+  Planet‑specific g and θ_v (composition/humidity) only enter via L (and θ_v definition).
+- When θ_v is ill‑defined (gas giants): use θ and N²; Ri_g and J=N²/S² provide parallel diagnostics; interpret ζ with an effective L from cloud‑top fluxes.
+
+Polar regions
+- Strong f, seasonal insolation gradients, katabatics: modify shear S and N², not the ζ‑curvature form.
+- Analyze curvature sign/inflection vs. latitude/season to tag regime transitions (e.g., polar night jets).
+
+Planet notes
+- Mars (low g): larger |ζ| windows; dust radiative coupling alters θ′ budgets—treat L with radiative‑corrected heat flux.
+- Venus (dense CO₂): small L near surface ⇒ amplified \(\partial_z^2 Ri_g\).
+- Titan: redefine θ_v with methane; recompute Δ,c₁ and neutral curvature.
