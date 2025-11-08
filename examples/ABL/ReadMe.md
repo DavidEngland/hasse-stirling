@@ -109,34 +109,24 @@ Action items
 - Validate neutral curvature 2Δ using near‑neutral segments (e.g., Mars daytime mixed layers).
 - Polar focus: map curvature sign/inflection vs. latitude and season; relate to jet structure (Mars/Venus poles, Jovian polar vortices).
 
-## 14. Deep‑Interior Link (Core/MHD, Gravity/Magnetic Variations)
-Context
-- Curvature thinking generalizes to stability metrics in rotating, stratified, magnetized flows.
+## 14. Variable L(z): Curvature Mapping and Check
+Use ζ=z/L(z). Derivatives:
+- dζ/dz = 1/L − z L'/L²
+- d²ζ/dz² = −2L'/L² − z L''/L² + 2z L'²/L³
 
-Suggested diagnostics
-- Shear vs. stratification: \(J=N^2/S^2\) (gradient‑Ri analogue).
-- Add magnetic influence: Elsasser Λ, magnetic Reynolds Rm, Ekman E, Rossby Ro; explore “magnetic Richardson” proxies (e.g., J/(1+Λ)).
-- Use HS series machinery to tabulate closure curves vs. dimensionless groups.
+Mapping:
+\[
+\partial_z^2 Ri_g = (d\zeta/dz)^2\,\partial_\zeta^2 Ri_g + (d^2\zeta/dz^2)\,\partial_\zeta Ri_g,
+\quad \partial_\zeta Ri_g=F(1+\zeta V_{\log}).
+\]
 
-Data tie‑ins
-- Gravity: GRACE/GOCE anomalies → differential rotation/mass redistribution signals.
-- Magnetism: secular variation, pole wander → time‑varying flow constraints for MHD inversions.
+Recipe
+1) Compute L(z), then L'(z), L''(z) with centered differences (light smoothing).
+2) Build ζ=z/L, evaluate F, V_log, W_log from chosen φ-set.
+3) Map theory to z via the formula above.
+4) Numerically differentiate model Ri_g(z) and compare (bias/RMSE/sign).
 
-Tasks
-- Prototype curvature‑style classifiers on synthetic rotating‑MHD shear layers; sensitivity to Ro, E, Λ.
-- Cross‑calibrate with observed gravity/magnetic trends to bound parameter ranges.
-
-## 15. Multi‑Profile Comparison (3–4 Families)
-Goal: repeat the curvature analysis for several φ families using the same diagnostics.
-
-Suggested set
-- BD (power‑law), QSBL (quadratic stable), CB‑type (pole‑free), DTP (dynamic Prandtl on top of a base φ_m).
-
-Steps
-1) Implement φ_m, φ_h callables per profile.
-2) Use the generic curvature evaluator (Section 3/8 here; Sections 25/19 in the math docs).
-3) Report: neutral curvature 2Δ, first inflection (if any), ζ range used, and ∂²Ri_g/∂z² at a reference height (via 1/L²).
-4) Plot normalized curvature \(\mathcal{C}(\zeta)\) for side‑by‑side comparison.
+Code: see map_curvature_z and numeric_curvature in Section 6/8 and 11A.
 
 ---
 This README focuses on practical boundary-layer use. Advanced operator / Hasse–Stirling derivations are documented in the main framework file.

@@ -218,23 +218,167 @@ Profiles to test (examples; fit coefficients to site/LES)
 
 Pluggable skeleton
 ```python
-def make_profile(tag, pars):
-    if tag=='BD':  # power-law
-        am, bm, ah, bh = pars['am'], pars['bm'], pars['ah'], pars['bh']
-        return (lambda z: (1-bm*z)**(-am),
-                lambda z: (1-bh*z)**(-ah))
-    if tag=='QSBL':
-        am,bm,ah,bh = pars['am'],pars['bm'],pars['ah'],pars['bh']
-        return (lambda z: 1+am*z+bm*z*z,
-                lambda z: 1+ah*z+bh*z*z)
-    if tag=='CB':  # Cheng–Brutsaert-type
-        gm,pm,gh,ph = pars['gm'],pars['pm'],pars['gh'],pars['ph']
-        return (lambda z: (1+gm*abs(z))**pm,
-                lambda z: (1+gh*abs(z))**ph)
-    raise ValueError('unknown profile')
-```
+import math
 
-Comparison workflow
-- Calibrate neutral coefficients (Δ, c1) for each profile.
-- Reuse Sections 4–8 and 11 for series, inflection, error control, height scaling.
-- Plot normalized curvature ratio \(\mathcal{C}(\zeta)\) to compare early‑ζ behavior.
+def _central_diff(f, x, h=1e-6):
+    return (f(x+h)-f(x-h))/(2*h)
+
+def _second_diff(f, x, h=1e-6):
+    return (f(x+h)-2*f(x)+f(x-h))/(h*h)
+
+def make_profile(tag, pars):
+    """
+    Returns (phi_m(zeta), phi_h(zeta)) callables.
+    Tags and expected pars (example defaults shown as comments):
+
+    BD_PL   : power-law (Businger–Dyer power-law form)
+        pars: am, bm, ah, bh   # α_m, β_m, α_h, β_h
+    BD_CLASSIC : classic BD (unstable power, stable linear)
+        pars: a=16.0, cm=5.0, ch=7.0, pm_exp=-0.25, ph_exp=-0.5
+    HOG88  : Högström-like stable linear
+        pars: cm=5.0, ch=7.8, c0h=0.95
+    QSBL   : quadratic stable (Beljaars–Holtslag style)
+        pars: am, bm, ah, bh   # linear & quadratic coeffs (a,b) for each
+    CB     : Cheng–Brutsaert-style all-stability
+        pars: gm, pm, gh, ph   # φ=(1+γ|ζ|)^p (even in sign), use sign if desired
+    RPL    : regularized power law
+        pars: alpha_m, beta_m, delta_m; alpha_h, beta_h, delta_h
+    VEXP   : variable exponent
+        pars: alpha_m, beta_m, eta_m; alpha_h, beta_h, eta_h
+    DTP    : dynamic turbulent Prandtl (φ_h = Pr_t(Ri)*φ_m)
+        pars: base_tag, base_pars, a1, a2
+    URC    : Ri-based closure (direct f_m(Ri); φ_m only)
+        pars: b_m, Ri_c, e_m; optionally b_h, e_h for φ_h
+    """
+    tag = tag.upper()
+
+    if tag == 'BD_PL':
+        am, bm, ah, bh = pars['am'], pars['bm'], pars['ah'], pars['bh']
+        return (lambda z: (1 - bm*z)**(-am),
+                lambda z: (1 - bh*z)**(-ah))
+
+    if tag == 'BD_CLASSIC':
+        a     = pars.get('a', 16.0)     # unstable |ζ|
+        cm    = pars.get('cm', 5.0)     # stable slope momentum
+        ch    = pars.get('ch', 7.0)     # stable slope heat
+        pm_e  = pars.get('pm_exp', -0.25)  # unstable exponent momentum
+        ph_e  = pars.get('ph_exp', -0.5)   # unstable exponent heat
+        def phi_m(z):
+            return (1 - a*z)**(pm_e) if z < 0 else (1 + cm*z)
+        def phi_h(z):
+            return (1 - a*z)**(ph_e) if z < 0 else (1 + ch*z)
+        return phi_m, phi_h
+
+    if tag == 'HOG88':
+        # Högström (1988) – typical stable fits; tune per site
+        cm = pars.get('cm', 5.0)
+        ch = pars.get('ch', 7.8)
+        c0h= pars.get('c0h', 0.95)  # intercept slightly below 1
+        return (lambda z: 1 + cm*z,
+                lambda z: c0h + ch*z)
+
+    if tag == 'QSBL':
+        # Beljaars–Holtslag-like stable polynomial
+        am, bm, ah, bh = pars['am'], pars['bm'], pars['ah'], pars['bh']
+        return (lambda z: 1 + am*z + bm*z*z,
+                lambda z: 1 + ah*z + bh*z*z)
+
+    if tag == 'CB':
+        gm, pm, gh, ph = pars['gm'], pars['pm'], pars['gh'], pars['ph']
+        return (lambda z: (1 + gm*abs(z))**pm,
+                lambda z: (1 + gh*abs(z))**ph)
+
+    if tag == 'RPL':
+        am, bm, dm = pars['alpha_m'], pars['beta_m'], pars['delta_m']
+        ah, bh, dh = pars['alpha_h'], pars['beta_h'], pars['delta_h']
+        def g(b, d, z): return (b*z)/(1 + d*b*z)
+        return (lambda z: (1 + g(bm, dm, z))**am,
+                lambda z: (1 + g(bh, dh, z))**ah)
+
+    if tag == 'VEXP':
+        am, bm, em = pars['alpha_m'], pars['beta_m'], pars['eta_m']
+        ah, bh, eh = pars['alpha_h'], pars['beta_h'], pars['eta_h']
+        return (lambda z: (1 - bm*z)**(-am*(1 + em*z)),
+                lambda z: (1 - bh*z)**(-ah*(1 + eh*z)))
+
+    if tag == 'DTP':
+        # φ_h = Pr_t(Ri)*φ_m; need Ri mapping => wrapper provided below
+        # Here we return base φ assuming Pr_t will be applied externally.
+        base_tag = pars['base_tag']; base_prs = pars['base_pars']
+        return make_profile(base_tag, base_prs)
+
+    if tag == 'URC':
+        # φ_m(Ri) directly; φ_h optional
+        b_m, Ri_c, e_m = pars['b_m'], pars['Ri_c'], pars['e_m']
+        fm = lambda Ri: (1 + b_m*Ri/Ri_c)**(-e_m)
+        if 'b_h' in pars and 'e_h' in pars:
+            b_h, e_h = pars['b_h'], pars['e_h']
+            fh = lambda Ri: (1 + b_h*Ri/pars.get('Ri_c_h', Ri_c))**(-e_h)
+        else:
+            fh = None
+        # Return ζ-agnostic wrappers; use Ri→ζ transformers below when needed
+        return fm, fh
+
+    raise ValueError(f'unknown profile tag {tag!r}')
+
+# === ζ ↔ Ri transformers and utilities ===
+
+def F_from(phi_m, phi_h):
+    return lambda z: phi_h(z)/(phi_m(z)**2)
+
+def ri_from_zeta(zeta, phi_m, phi_h):
+    F = F_from(phi_m, phi_h)
+    return zeta * F(zeta)
+
+def zeta_from_ri_series(Ri, Delta, c1):
+    # ζ = Ri - Δ Ri^2 + (1.5Δ^2 - 0.5 c1) Ri^3
+    return Ri - Delta*Ri*Ri + (1.5*Delta*Delta - 0.5*c1)*(Ri**3)
+
+def zeta_from_ri_newton(Ri_target, phi_m, phi_h, z0, tol=1e-10, maxit=20):
+    F = F_from(phi_m, phi_h)
+    z = z0
+    for _ in range(maxit):
+        # numerical V_log, W_log
+        Vlog = _central_diff(lambda zz: math.log(F(zz)), z)
+        Wlog = _second_diff(lambda zz: math.log(F(zz)), z)
+        f  = z*F(z) - Ri_target
+        fp = F(z) + z*F(z)*Vlog
+        if fp == 0: break
+        dz = f/fp
+        z -= dz
+        if abs(dz) < tol:
+            return z
+    return z  # return last iterate
+
+def ri_to_phi_wrappers(tag, pars, Delta=None, c1=None):
+    """
+    Returns (f_m(Ri), f_h(Ri)) built from a ζ-profile and ζ(Ri).
+    If DTP is requested, applies Pr_t(Ri)=1+a1 Ri+a2 Ri^2 to φ_h.
+    """
+    if tag.upper() == 'URC':
+        return make_profile(tag, pars)
+
+    phi_m, phi_h = make_profile(tag, pars)
+    # choose series seed if Delta,c1 provided else small-Ri seed
+    def zeta_of_Ri(Ri):
+        z0 = zeta_from_ri_series(Ri, Delta, c1) if (Delta is not None and c1 is not None) else Ri
+        return zeta_from_ri_newton(Ri, phi_m, phi_h, z0)
+
+    if tag.upper() == 'DTP':
+        base_tag = pars['base_tag']; base_pars = pars['base_pars']
+        a1, a2   = pars.get('a1', 0.0), pars.get('a2', 0.0)
+        base_m, base_h = make_profile(base_tag, base_pars)
+        def fm(Ri): 
+            z = zeta_of_Ri(Ri); return base_m(z)
+        def fh(Ri):
+            z = zeta_of_Ri(Ri)
+            Prt = 1 + a1*Ri + a2*Ri*Ri
+            return Prt*base_m(z)
+        return fm, fh
+
+    def fm(Ri):
+        z = zeta_of_Ri(Ri); return phi_m(z)
+    def fh(Ri):
+        z = zeta_of_Ri(Ri); return phi_h(z)
+    return fm, fh
+````

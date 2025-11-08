@@ -146,6 +146,65 @@ Using ζ=z/L and treating L locally constant over the layer of interest,
 \]
 If L varies with height and that variation is retained, additional terms involving dL/dz appear; in MOST applications we evaluate curvature at a level using the local L, so the 1/L² factor is appropriate.
 
+## 11A. Variable-L(z) Mapping and Model Diagnostics
+When \(L\) varies with height, let \(\zeta(z)=z/L(z)\). Then
+\[
+\frac{d\zeta}{dz}=\frac{1}{L}-\frac{zL'}{L^{2}}=\frac{L-zL'}{L^{2}},\qquad
+\frac{d^{2}\zeta}{dz^{2}}=-\frac{2L'}{L^{2}}-\frac{zL''}{L^{2}}+\frac{2z\,L'^2}{L^{3}}.
+\]
+Chain rule:
+\[
+\frac{\partial Ri_g}{\partial z}=\frac{d\zeta}{dz}\,\frac{dRi_g}{d\zeta},\quad
+\boxed{\frac{\partial^{2} Ri_g}{\partial z^{2}}=\Big(\frac{d\zeta}{dz}\Big)^{2}\frac{d^{2}Ri_g}{d\zeta^{2}}+\frac{d^{2}\zeta}{dz^{2}}\frac{dRi_g}{d\zeta}}.
+\]
+Here
+\[
+\frac{dRi_g}{d\zeta}=F+\zeta F' = F\big(1+\zeta V_{\log}\big),\qquad
+\frac{d^{2}Ri_g}{d\zeta^{2}}=F\big[2V_{\log}+\zeta(V_{\log}^{2}-W_{\log})\big].
+\]
+
+Practical recipe (per model time/column)
+- Inputs on model levels: height array z, θ (or θ_v), u,v, turbulent fluxes to compute L(z).
+- Compute L(z) and finite-difference L'(z), L''(z) with light smoothing.
+- Build ζ_i = z_i/L_i; evaluate theoretical dRi_g/dζ and d²Ri_g/dζ² from chosen φ-set at ζ_i.
+- Map to height curvature using the boxed formula above.
+- Independently estimate Ri_g(z)=N^2/S^2 (or MOST form from φ) and compute numeric ∂²Ri_g/∂z² via centered differences (optional Savitzky–Golay smoothing).
+- Compare theoretical vs numeric curvature: bias, RMSE, correlation, and sign-agreement.
+
+Minimal code sketch
+```python
+import numpy as np
+
+def diffs(y, z):
+    dz = np.gradient(z)
+    y1 = np.gradient(y, z)
+    y2 = np.gradient(y1, z)
+    return y1, y2
+
+def map_curvature_z(z, L, zeta, F, Vlog, Wlog):
+    # theory in ζ
+    dRi_dzeta  = F*(1 + zeta*Vlog)
+    d2Ri_dzeta2= F*(2*Vlog + zeta*(Vlog*Vlog - Wlog))
+    # L-derivatives
+    L1, L2 = diffs(L, z)
+    dzeta_dz  = 1.0/L - (z*L1)/(L*L)
+    d2zeta_dz2= -2*L1/(L*L) - (z*L2)/(L*L) + 2*z*(L1*L1)/(L*L*L)
+    # mapped curvature
+    curv_z = (dzeta_dz*dzeta_dz)*d2Ri_dzeta2 + d2zeta_dz2*dRi_dzeta
+    return curv_z
+
+# numeric curvature from modeled Ri_g(z)
+def numeric_curvature(Ri_g, z, window=None):
+    # optional smoothing step could be inserted here
+    _, d2 = diffs(Ri_g, z)
+    return d2
+```
+
+Notes
+- Use consistent staggering for z, θ, u,v when forming N² and S²; compute L at the same levels used for ζ.
+- Regularize L'(z), L''(z) (e.g., weak SG filter) to reduce amplification of noise in d²ζ/dz².
+- Report both mapped curvature and direct numeric curvature with uncertainty bands from differencing step.
+
 ## 12. Dimensionless Control Parameters and Inflection Structure
 Define
 \[
@@ -516,27 +575,106 @@ Procedure (per profile)
 3) Reuse sections 5, 11, 12–16 for series, chain rule to z, inflection, inversion ζ(Ri), and diagnostics.
 4) Validate against the same acceptance band for ζ and report the same minimal set (neutral curvature, first inflection, series inversion).
 
-Pluggable evaluation sketch
+Pluggable evaluation sketch (extended profiles + ζ↔Ri)
 ```python
-# given callable phi_m(zeta), phi_h(zeta)
+import math
+
+def _central_diff(f, x, h=1e-6):  return (f(x+h)-f(x-h))/(2*h)
+def _second_diff(f, x, h=1e-6):   return (f(x+h)-2*f(x)+f(x-h))/(h*h)
+
+def make_profile(tag, pars):
+    tag = tag.upper()
+    if tag == 'BD_PL':
+        am, bm, ah, bh = pars['am'], pars['bm'], pars['ah'], pars['bh']
+        return (lambda z: (1 - bm*z)**(-am),
+                lambda z: (1 - bh*z)**(-ah))
+    if tag == 'BD_CLASSIC':
+        a=pars.get('a',16.0); cm=pars.get('cm',5.0); ch=pars.get('ch',7.0)
+        pm_e=pars.get('pm_exp',-0.25); ph_e=pars.get('ph_exp',-0.5)
+        phi_m = lambda z: (1 - a*z)**(pm_e) if z<0 else (1 + cm*z)
+        phi_h = lambda z: (1 - a*z)**(ph_e) if z<0 else (1 + ch*z)
+        return phi_m, phi_h
+    if tag == 'HOG88':
+        cm=pars.get('cm',5.0); ch=pars.get('ch',7.8); c0h=pars.get('c0h',0.95)
+        return (lambda z: 1 + cm*z, lambda z: c0h + ch*z)
+    if tag == 'QSBL':
+        am, bm, ah, bh = pars['am'], pars['bm'], pars['ah'], pars['bh']
+        return (lambda z: 1 + am*z + bm*z*z,
+                lambda z: 1 + ah*z + bh*z*z)
+    if tag == 'CB':
+        gm, pm, gh, ph = pars['gm'], pars['pm'], pars['gh'], pars['ph']
+        return (lambda z: (1 + gm*abs(z))**pm,
+                lambda z: (1 + gh*abs(z))**ph)
+    if tag == 'RPL':
+        am,bm,dm = pars['alpha_m'],pars['beta_m'],pars['delta_m']
+        ah,bh,dh = pars['alpha_h'],pars['beta_h'],pars['delta_h']
+        def g(b,d,z): return (b*z)/(1 + d*b*z)
+        return (lambda z: (1 + g(bm,dm,z))**am,
+                lambda z: (1 + g(bh,dh,z))**ah)
+    if tag == 'VEXP':
+        am,bm,em = pars['alpha_m'],pars['beta_m'],pars['eta_m']
+        ah,bh,eh = pars['alpha_h'],pars['beta_h'],pars['eta_h']
+        return (lambda z: (1 - bm*z)**(-am*(1 + em*z)),
+                lambda z: (1 - bh*z)**(-ah*(1 + eh*z)))
+    if tag == 'DTP':
+        base_tag = pars['base_tag']; base_pars = pars['base_pars']
+        return make_profile(base_tag, base_pars)
+    if tag == 'URC':
+        b_m, Ri_c, e_m = pars['b_m'], pars['Ri_c'], pars['e_m']
+        fm = lambda Ri: (1 + b_m*Ri/Ri_c)**(-e_m)
+        fh = None
+        if 'b_h' in pars and 'e_h' in pars:
+            fh = lambda Ri: (1 + pars['b_h']*Ri/pars.get('Ri_c_h', Ri_c))**(-pars['e_h'])
+        return fm, fh
+    raise ValueError(f'unknown tag {tag!r}')
+
+def F_from(phi_m, phi_h): return lambda z: phi_h(z)/(phi_m(z)**2)
+def ri_from_zeta(z, phi_m, phi_h): return z*F_from(phi_m, phi_h)(z)
+
+def zeta_from_ri_series(Ri, Delta, c1):
+    return Ri - Delta*Ri*Ri + (1.5*Delta*Delta - 0.5*c1)*(Ri**3)
+
+def zeta_from_ri_newton(Ri_target, phi_m, phi_h, z0, tol=1e-10, maxit=20):
+    F = F_from(phi_m, phi_h); z=z0
+    for _ in range(maxit):
+        Vlog = _central_diff(lambda zz: math.log(F(zz)), z)
+        f  = z*F(z) - Ri_target
+        fp = F(z) + z*F(z)*Vlog
+        if fp == 0: break
+        dz = f/fp; z -= dz
+        if abs(dz) < tol: break
+    return z
+
+def ri_to_phi_wrappers(tag, pars, Delta=None, c1=None):
+    if tag.upper() == 'URC':
+        return make_profile(tag, pars)
+    phi_m, phi_h = make_profile(tag, pars)
+    def zeta_of_Ri(Ri):
+        z0 = zeta_from_ri_series(Ri, Delta, c1) if (Delta is not None and c1 is not None) else Ri
+        return zeta_from_ri_newton(Ri, phi_m, phi_h, z0)
+    if tag.upper() == 'DTP':
+        base_tag=pars['base_tag']; base_pars=pars['base_pars']
+        a1=pars.get('a1',0.0); a2=pars.get('a2',0.0)
+        base_m, _ = make_profile(base_tag, base_pars)
+        def fm(Ri): z=zeta_of_Ri(Ri); return base_m(z)
+        def fh(Ri): z=zeta_of_Ri(Ri); return (1+a1*Ri+a2*Ri*Ri)*base_m(z)
+        return fm, fh
+    def fm(Ri): z=zeta_of_Ri(Ri); return phi_m(z)
+    def fh(Ri): z=zeta_of_Ri(Ri); return phi_h(z)
+    return fm, fh
+
+# Curvature in ζ for any φ-set (analytic or numeric derivatives)
 def rig_curvature_generic(zeta, phi_m, phi_h, L):
     pm = phi_m(zeta); ph = phi_h(zeta)
-    # numerical or analytic derivatives; here 2-sided finite-diff as placeholder
-    dz = 1e-6
-    dpm = (phi_m(zeta+dz)-phi_m(zeta-dz))/(2*dz)
-    dph = (phi_h(zeta+dz)-phi_h(zeta-dz))/(2*dz)
+    dpm = _central_diff(phi_m, zeta); dph = _central_diff(phi_h, zeta)
     Vlog = (dph/ph) - 2*(dpm/pm)
-    # W_log via diff of Vlog
-    Vp = ((phi_h(zeta+dz+dz)-phi_h(zeta+dz-dz))/(2*dz))/phi_h(zeta+dz) \
-         - 2*((phi_m(zeta+dz+dz)-phi_m(zeta+dz-dz))/(2*dz))/phi_m(zeta+dz)
-    Vm = ((phi_h(zeta-dz+dz)-phi_h(zeta-dz-dz))/(2*dz))/phi_h(zeta-dz) \
-         - 2*((phi_m(zeta-dz+dz)-phi_m(zeta-dz-dz))/(2*dz))/phi_m(zeta-dz)
-    Wlog = (Vp - Vm)/(2*dz)
+    # finite-diff W_log via V_log deriv
+    Vp = ( ( _central_diff(phi_h, zeta+1e-6)/(phi_h(zeta+1e-6)) )
+           - 2*( _central_diff(phi_m, zeta+1e-6)/(phi_m(zeta+1e-6)) ) )
+    Vm = ( ( _central_diff(phi_h, zeta-1e-6)/(phi_h(zeta-1e-6)) )
+           - 2*( _central_diff(phi_m, zeta-1e-6)/(phi_m(zeta-1e-6)) ) )
+    Wlog = (Vp - Vm)/(2e-6)
     F = ph/(pm*pm)
     curv_zeta = F*(2*Vlog + zeta*(Vlog*Vlog - Wlog))
     return curv_zeta, curv_zeta/(L*L)
 ```
-
-Reporting
-- Keep the same neutral/inflection/series inversion outputs to compare profiles on equal footing.
-- For bounded/pole‑free families, document ζ_max used and any capping/blending applied.

@@ -43,4 +43,19 @@ The curvature with respect to the physical height $z$ is related to the $\zeta$-
 \label{eq:rig_curvature_physical}
 \boxed{\frac{\partial^2 Ri_g}{\partial z^2}=\frac{1}{L^2}\frac{d^{2}Ri_g}{d\zeta^{2}}.}
 \end{equation}
-\end{itemize}
+
+\subsection*{Variable-$L(z)$ Mapping (General Chain Rule)}
+Let $\zeta(z)=z/L(z)$ with $L'(z)=dL/dz$, $L''(z)=d^2L/dz^2$. Then
+\[
+\frac{d\zeta}{dz}=\frac{1}{L}-\frac{zL'}{L^{2}}=\frac{L-zL'}{L^{2}},\qquad
+\frac{d^{2}\zeta}{dz^{2}}=-\frac{2L'}{L^{2}}-\frac{zL''}{L^{2}}+\frac{2z\,L'^2}{L^{3}}.
+\]
+With $Ri_g=Ri_g(\zeta)$,
+\begin{equation}
+\label{eq:rig_curvature_variableL}
+\boxed{\frac{\partial^{2} Ri_g}{\partial z^{2}}=\Big(\frac{d\zeta}{dz}\Big)^{2}\frac{d^{2}Ri_g}{d\zeta^{2}}+\frac{d^{2}\zeta}{dz^{2}}\frac{dRi_g}{d\zeta}}.
+\end{equation}
+Here $dRi_g/d\zeta=F+\zeta F'=F(1+\zeta V_{\log})$ and $d^{2}Ri_g/d\zeta^{2}$ is given by (\ref{eq:rig_curvature_compact}).
+
+\paragraph{Model Comparison.}
+Given $(z_i, L_i)$ from the model, evaluate $\zeta_i=z_i/L_i$, $F_i$, $V_{\log,i}$, $W_{\log,i}$, form $d\zeta/dz$, $d^2\zeta/dz^2$ by finite differences of $L$, and map theoretical curvature to height using (\ref{eq:rig_curvature_variableL}). Compare against a direct numerical second derivative of $Ri_g(z)$ from model fields.
