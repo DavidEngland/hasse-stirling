@@ -22,6 +22,32 @@ Ri_g(\zeta)=\zeta\,\frac{\phi_h(\zeta)}{\phi_m(\zeta)^2}=\zeta\,F(\zeta),
 F(\zeta)= (1-\beta_h \zeta)^{-\alpha_h}(1-\beta_m \zeta)^{2\alpha_m}.
 \]
 
+Logarithmic derivative components (unified general form):
+\[
+v_m=\frac{1}{\phi_m}\frac{d\phi_m}{d\zeta},\qquad
+v_h=\frac{1}{\phi_h}\frac{d\phi_h}{d\zeta},\qquad
+V_{\log}=v_h-2v_m,\qquad
+W_{\log}=\frac{dV_{\log}}{d\zeta}= \frac{dv_h}{d\zeta}-2\frac{dv_m}{d\zeta}.
+\]
+For the power-law case:
+\[
+v_m=\frac{\alpha_m\beta_m}{1-\beta_m\zeta},\quad
+v_h=\frac{\alpha_h\beta_h}{1-\beta_h\zeta},\quad
+V_{\log}=\frac{\alpha_h\beta_h}{1-\beta_h\zeta}-\frac{2\alpha_m\beta_m}{1-\beta_m\zeta},
+\]
+\[
+W_{\log}=
+\frac{\alpha_h\beta_h^{2}}{(1-\beta_h\zeta)^2}-\frac{2\alpha_m\beta_m^{2}}{(1-\beta_m\zeta)^2}.
+\]
+Note: Earlier “G” and “G′” in generic analysis correspond to \(V_{\log}, W_{\log}\).
+
+Gradient Richardson number (MOST form):
+\[
+Ri_g(\zeta)=\zeta\,\frac{\phi_h(\zeta)}{\phi_m(\zeta)^2}=\zeta\,F(\zeta),
+\qquad
+F(\zeta)= (1-\beta_h \zeta)^{-\alpha_h}(1-\beta_m \zeta)^{2\alpha_m}.
+\]
+
 Logarithmic derivative components:
 \[
 V_{\log}=\frac{1}{\phi_h}\frac{d\phi_h}{d\zeta}-\frac{2}{\phi_m}\frac{d\phi_m}{d\zeta}
@@ -213,7 +239,7 @@ Notation:
 \]
 General curvature mapping:
 \[
-\frac{\partial^{2}Ri_g}{\partial z^{2}}=\left(\frac{d\zeta}{dz}\right^2\frac{d^{2}Ri_g}{d\zeta^{2}}+\frac{d^{2}\zeta}{dz^{2}}\frac{dRi_g}{d\zeta}.
+\frac{\partial^{2}Ri_g}{\partial z^{2}}=\left(\frac{d\zeta}{dz}\right)^{2}\frac{d^{2}Ri_g}{d\zeta^{2}}+\frac{d^{2}\zeta}{dz^{2}}\frac{dRi_g}{d\zeta}.
 \]
 
 Define nondimensional variation measures (evaluated at height z):
@@ -763,3 +789,4 @@ def rig_curvature_generic(zeta, phi_m, phi_h, L):
     F = ph/(pm*pm)
     curv_zeta = F*(2*Vlog + zeta*(Vlog*Vlog - Wlog))
     return curv_zeta, curv_zeta/(L*L)
+````

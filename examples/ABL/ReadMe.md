@@ -20,6 +20,16 @@ W_{\log}=\frac{\alpha_h\beta_h^2}{(1-\beta_h\zeta)^2}-\frac{2\alpha_m\beta_m^2}{
 \partial_z^2 Ri_g = \frac{1}{L^{2}}\partial_\zeta^2 Ri_g
 \]
 
+## 3A. Unified Log-Derivatives (Reuse Across Profiles)
+\[
+v_m=\frac{\phi_m'}{\phi_m},\ v_h=\frac{\phi_h'}{\phi_h},\ V_{\log}=v_h-2v_m,\ W_{\log}=V_{\log}'.
+\]
+Curvature expression (generic):
+\[
+\partial_\zeta^2 Ri_g = F[2V_{\log}+\zeta(V_{\log}^2-W_{\log})],\quad F=\phi_h/\phi_m^2.
+\]
+Any differentiable φ-set (quadratic, regularized, blended) plugs into the same form by providing \(v_m,v_h\).
+
 ## 4. Typical Parameter Ranges
 Businger–Dyer style near-neutral fits (site dependent):
 - \(\alpha_m,\alpha_h \approx 0.45\)–0.55

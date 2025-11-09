@@ -89,3 +89,10 @@ The $\phi$ functions and $Ri_g$ are evaluated layer-by-layer based on the calcul
 Since $L$ is a constant for a given surface flux state, the entire $Ri_g(\zeta)$ curve is fixed, and you can then proceed with the **Finite Difference curvature calculation** across your few discrete layers.
 
 **Key point:** The accuracy of the $Ri_g$ curvature on a few layers depends entirely on having a high-quality (log-stretched) grid and an accurate **flux input** to anchor $L$.
+
+### Curvature Hook
+For each stretched grid level compute $v_m,v_h$ (power-law analytic), then
+\[
+V_{\log}=v_h-2v_m,\ W_{\log}=V_{\log}',\ \partial_\zeta^2 Ri_g=F[2V_{\log}+\zeta(V_{\log}^2-W_{\log})].
+\]
+Map to height with constant or variable L logic for slope-adjusted stratification.

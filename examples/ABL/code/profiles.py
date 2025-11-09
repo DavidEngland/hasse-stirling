@@ -311,24 +311,45 @@ def ri_to_phi_wrappers(tag: str,
 
     return fm, fh
 
+def compute_vlog_wlog(zeta: float,
+                      phi_m: Callable[[float], float],
+                      phi_h: Callable[[float], float],
+                      h: float = 1e-6) -> tuple[float, float, float, float]:
+    """Compute per-component logs v_m, v_h and combined V_log, W_log at ζ.
+    v_m = (φ_m'/φ_m); v_h = (φ_h'/φ_h); V_log = v_h - 2 v_m; W_log = V_log'.
+    Central differences used if analytic derivatives unavailable.
+    """
+    pm = phi_m(zeta); ph = phi_h(zeta)
+    v_m = _central_diff(phi_m, zeta, h) / max(pm, 1e-300)
+    v_h = _central_diff(phi_h, zeta, h) / max(ph, 1e-300)
+    # V_log derivative: differentiate V_log directly
+    def V_of(zz: float) -> float:
+        pmt = phi_m(zz); pht = phi_h(zz)
+        vm = _central_diff(phi_m, zz, h) / max(pmt, 1e-300)
+        vh = _central_diff(phi_h, zz, h) / max(pht, 1e-300)
+        return vh - 2*vm
+    V_log = v_h - 2*v_m
+    W_log = _central_diff(V_of, zeta, h)
+    return v_m, v_h, V_log, W_log
+
 def rig_derivatives_zeta(
     zeta: float,
     phi_m: callable,
     phi_h: callable,
 ) -> tuple[float, float, float, float]:
     """
-    Return (dRi_g/dζ, d²Ri_g/dζ², F, G) at ζ for given φ_m, φ_h.
-    Uses logarithmic derivatives:
+    Return (dRi_g/dζ, d²Ri_g/dζ², F, V_log) at ζ for given φ_m, φ_h.
+    Uses unified logarithmic derivatives:
       F = φ_h / φ_m²
-      G = d(ln F)/dζ
-      dRi/dζ = F (1 + ζ G)
-      d²Ri/dζ² = F [ 2 G + ζ (G² - G') ], with G' = dG/dζ
+      V_log = v_h - 2 v_m
+      W_log = dV_log/dζ
+      dRi/dζ = F (1 + ζ V_log)
+      d²Ri/dζ² = F [ 2 V_log + ζ (V_log² - W_log) ]
     """
     F_fun = F_from(phi_m, phi_h)
     F_val = F_fun(zeta)
-    # G and G' by differentiating log(F)
-    G = _central_diff(lambda zz: math.log(max(F_fun(zz), 1e-300)), zeta)
-    Gp = _second_diff(lambda zz: math.log(max(F_fun(zz), 1e-300)), zeta)
-    dRi_dzeta = F_val * (1.0 + zeta * G)
-    d2Ri_dzeta2 = F_val * (2.0 * G + zeta * (G * G - Gp))
-    return dRi_dzeta, d2Ri_dzeta2, F_val, G
+    # compute combined logs
+    _, _, V_log, W_log = compute_vlog_wlog(zeta, phi_m, phi_h)
+    dRi_dzeta = F_val * (1.0 + zeta * V_log)
+    d2Ri_dzeta2 = F_val * (2.0 * V_log + zeta * (V_log * V_log - W_log))
+    return dRi_dzeta, d2Ri_dzeta2, F_val, V_log

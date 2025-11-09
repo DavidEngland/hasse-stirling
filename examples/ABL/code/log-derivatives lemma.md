@@ -20,6 +20,21 @@ G'(\zeta)=\frac{\alpha_h\beta_h^2}{(1-\beta_h\zeta)^2}-\frac{2\alpha_m\beta_m^2}
 \]
 (Here \(W_{\log}\) equals \(G'\); earlier power‑law notation sometimes uses \(-W_{\log}\)—we adopt the sign above for consistency.)
 
+## 2A. Mapping to MOST Notation
+Let
+\[
+v_m=\frac{\phi_m'}{\phi_m},\quad v_h=\frac{\phi_h'}{\phi_h},\quad
+V_{\log}=v_h-2v_m,\quad W_{\log}=V_{\log}'.
+\]
+Then the generic symbols of Section 2:
+\[
+G \equiv V_{\log},\qquad G' \equiv W_{\log},\qquad G'' \equiv \frac{dW_{\log}}{d\zeta}.
+\]
+Curvature formula equivalence:
+\[
+R''_g=F\big[2G+\zeta(G^{2}+G')\big]=F\big[2V_{\log}+\zeta(V_{\log}^{2}-W_{\log})\big].
+\]
+
 ## 3. Bell Polynomial Lemma
 Let \(x_1=G, x_2=G', x_3=G'',\dots\). The complete exponential Bell polynomials \(B_n\) give
 \[
@@ -58,6 +73,10 @@ R''_g(0)=2G(0),\qquad R'''_g(0)=3\big(G(0)^2+G'(0)\big).
 R''_g(\zeta)\approx 2G(0)+\zeta\,(G(0)^2+G'(0))\Rightarrow 
 \zeta_{\text{inf}}\approx -\frac{2G(0)}{G(0)^2+G'(0)}\quad (\text{valid if } | \zeta_{\text{inf}}|\ll \zeta_\text{domain}).
 \]
+
+## 6A. Climate / ABL Modeling Emphasis
+- Unified \(V_{\log},W_{\log}\) let mixed profile families share identical curvature evaluation logic.
+- Diagnostic: large \(|W_{\log}/V_{\log}^{2}|\) flags layers where stability correction curvature may dominate shear—candidate for vertical refinement.
 
 ## 7. Mapping to Height (Variable \(L(z)\))
 With \(\zeta=z/L(z)\):

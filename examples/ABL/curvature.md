@@ -20,6 +20,17 @@ F=(1-\beta_h\zeta)^{-\alpha_h}(1-\beta_m\zeta)^{2\alpha_m}.
 W_{\log}=\frac{dV_{\log}}{d\zeta}= \frac{\alpha_h\beta_h^2}{(1-\beta_h\zeta)^2}-\frac{2\alpha_m\beta_m^2}{(1-\beta_m\zeta)^2}.
 \]
 
+## 2A. Unified Log-Derivative Notation
+\[
+v_m=\frac{\phi_m'}{\phi_m},\quad v_h=\frac{\phi_h'}{\phi_h},\quad
+V_{\log}=v_h-2v_m,\quad W_{\log}=V_{\log}'=v_h'-2v_m'.
+\]
+Generic curvature:
+\[
+\frac{d^{2}Ri_g}{d\zeta^{2}}=F\left[2V_{\log}+\zeta(V_{\log}^{2}-W_{\log})\right].
+\]
+This matches earlier “G” (\(=V_{\log}\)) and “G′” (\(=W_{\log}\)).
+
 ## 3. Curvature
 \[
 \frac{d^2 Ri_g}{d\zeta^2}=F\Big[2V_{\log}+\zeta(V_{\log}^2-W_{\log})\Big].
@@ -82,6 +93,11 @@ Binomial remainder for φ functions ensures absolute error bound for truncated c
 2. Else evaluate rational form with guards.
 3. Optional Newton refinement for ζ(Ri) starting from series inversion.
 4. Report diagnostics: \(\Delta, c_1, \zeta_{\text{inf}}\) (if admissible), curvature ratio \(\mathcal{C}(\zeta)\).
+
+## 11A. Operational / Climate Model Notes
+- Provide \(V_{\log},W_{\log}\) directly for multi-profile testing (power-law, quadratic, regularized).
+- Use \(W_{\log}\) sign changes to anticipate intermittent regime onset.
+- Arctic amplification: elevated static stability ⇒ larger \(v_h\) gradients; curvature aids vertical diffusion constraint tuning.
 
 ## 12. Summary Identities (Ready for Coding)
 \[

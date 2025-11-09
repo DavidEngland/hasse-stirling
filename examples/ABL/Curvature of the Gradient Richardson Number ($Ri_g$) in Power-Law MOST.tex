@@ -57,5 +57,18 @@ With $Ri_g=Ri_g(\zeta)$,
 \end{equation}
 Here $dRi_g/d\zeta=F+\zeta F'=F(1+\zeta V_{\log})$ and $d^{2}Ri_g/d\zeta^{2}$ is given by (\ref{eq:rig_curvature_compact}).
 
+\paragraph{Unified Log-Derivative Components}
+Let
+\[
+v_m=\frac{\phi_m'}{\phi_m}=\frac{\alpha_m\beta_m}{1-\beta_m\zeta},\quad
+v_h=\frac{\phi_h'}{\phi_h}=\frac{\alpha_h\beta_h}{1-\beta_h\zeta},
+\]
+\[
+V_{\log}=v_h-2v_m,\qquad W_{\log}=\frac{dV_{\log}}{d\zeta}= \frac{\alpha_h\beta_h^{2}}{(1-\beta_h\zeta)^2}-\frac{2\alpha_m\beta_m^{2}}{(1-\beta_m\zeta)^2}.
+\]
+Then Eq.~(\ref{eq:rig_curvature_compact}) is $F[2V_{\log}+\zeta(V_{\log}^2-W_{\log})]$.
+
+\paragraph{Modeling Note.} Using $v_h,v_m$ allows easy extension to non power-law $\phi$ (quadratic, regularized, blended) while preserving curvature form.
+
 \paragraph{Model Comparison.}
 Given $(z_i, L_i)$ from the model, evaluate $\zeta_i=z_i/L_i$, $F_i$, $V_{\log,i}$, $W_{\log,i}$, form $d\zeta/dz$, $d^2\zeta/dz^2$ by finite differences of $L$, and map theoretical curvature to height using (\ref{eq:rig_curvature_variableL}). Compare against a direct numerical second derivative of $Ri_g(z)$ from model fields.

@@ -131,14 +131,10 @@ C_H(z_r)=\frac{\kappa^2}{\big[\ln\frac{z_r-d}{z_0}-\psi_m(\zeta_r)\big]\big[\ln\
 \]
 Workflow: estimate \(u_*,z_0,z_{0h}\) by stability-aware regression; evaluate \(C_{D,H}\) at a specified \(z_r\) (or at \(z_g\) for averaged winds).
 
-## 10. MOST Power-Law Variant (for modeling)
-For analytic work (and series/continuation):
+## 10. Link to Ri_g Curvature Diagnostics
+Stability adjustments (non-neutral): add ψ_m, ψ_h. Their ζ-gradients feed \(v_m,v_h\) ⇒ \(V_{\log},W_{\log}\) for curvature:
 \[
-\phi_m(\zeta)=(1-\beta_m\zeta)^{-\alpha_m},\quad \phi_h(\zeta)=(1-\beta_h\zeta)^{-\alpha_h},
+V_{\log}=v_h-2v_m,\quad W_{\log}=V_{\log}'.
 \]
-with domain \(1-\beta_{(\cdot)}\zeta>0\). Integrate to obtain \(\psi_{m,h}\) or use near-neutral series:
-\[
-\phi\simeq 1+\alpha\beta\,\zeta+\tfrac{1}{2}\alpha(\alpha+1)(\beta\zeta)^2+\cdots.
-\]
-Use guards near the singular approach (e.g., \(\zeta<0.7/\max\beta\)).
+Including curvature at the first level reduces drag coefficient bias under stable stratification (see curvature toolkit).
 

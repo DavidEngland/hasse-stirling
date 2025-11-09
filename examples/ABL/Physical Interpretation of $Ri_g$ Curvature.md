@@ -17,6 +17,18 @@ Gradient Richardson number (scaled form) has factor
 F(\zeta)=\frac{\phi_h(\zeta)}{\phi_m(\zeta)^2}=(1-\beta_h\zeta)^{-\alpha_h}(1-\beta_m\zeta)^{2\alpha_m}.
 \]
 
+## 1A. Unified Log-Derivatives
+Previous notation used \(V_{\log}\) directly; we now define component logs:
+\[
+v_m=\frac{\phi_m'}{\phi_m},\quad v_h=\frac{\phi_h'}{\phi_h},\quad
+V_{\log}=v_h-2v_m,\quad W_{\log}=V_{\log}'=v_h'-2v_m'.
+\]
+Curvature:
+\[
+\partial_{\zeta}^2 Ri_g=F\big[2V_{\log}+\zeta(V_{\log}^2-W_{\log})\big].
+\]
+Implementation: compute \(v_{m,h}\) analytically (power-law) or numerically, then form \(V_{\log},W_{\log}\) for robustness across profile families.
+
 Logarithmic derivative components:
 \[
 V_{\log}=\frac{1}{\phi_h}\frac{d\phi_h}{d\zeta}-\frac{2}{\phi_m}\frac{d\phi_m}{d\zeta}
