@@ -189,6 +189,13 @@ Expected outputs
 - Benchmarked HS-assisted series for ABL tasks.
 - Thesis proposal draft with preliminary figures.
 
+### ABL Height Mapping Note (Constant vs Variable \(L\))
+Decision logic for mapping curvature:
+- Compute \(\varepsilon_1=z|L'|/L\), \(\chi=|(d^{2}\zeta/dz^{2})(dRi_g/d\zeta)| / ((d\zeta/dz)^2 d^{2}Ri_g/d\zeta^{2})\).
+- If \(\varepsilon_1<0.05\) and \(\chi<0.05\): use constant-\(L\) shortcut \(\partial_z^2 Ri_g \approx (1/L^2)\partial_\zeta^2 Ri_g\).
+- Else apply full mapping with \(L',L''\).
+- Linear / power-law profiles have closed forms, enabling fast evaluation and HS-assisted error tagging.
+
 ## 9. Operator / Generating Function Detail for MOST Power Laws
 For \(\phi(\zeta)=(1-\beta\zeta)^{-\alpha}=\exp\{\alpha \mathrm{Li}_1(\beta\zeta)\}\) with \(\mathrm{Li}_1(x)=-\ln(1-x)\). HS expansion of \(\mathrm{Li}_1\):
 \[

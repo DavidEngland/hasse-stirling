@@ -381,4 +381,61 @@ def ri_to_phi_wrappers(tag, pars, Delta=None, c1=None):
     def fh(Ri):
         z = zeta_of_Ri(Ri); return phi_h(z)
     return fm, fh
-````
+
+## 15D. Constant vs Structured \(L(z)\) — Simplifications
+
+General mapping (from 15C):
+\[
+\partial_z^2 Ri_g=(\zeta'_z)^2\,\partial_\zeta^2 Ri_g+\zeta''_z\,\partial_\zeta Ri_g,\quad
+\zeta'_z=\frac{L-zL'}{L^2},\ \zeta''_z=-\frac{2L'}{L^{2}}-\frac{zL''}{L^{2}}+\frac{2z(L')^{2}}{L^{3}}.
+\]
+
+Special cases:
+
+1. Constant \(L=L_0\):
+\[
+\partial_z^2 Ri_g=\frac{1}{L_0^2}\partial_\zeta^2 Ri_g.
+\]
+
+2. Affine \(L=L_0+\lambda z\):
+\[
+\zeta'_z=\frac{L_0}{(L_0+\lambda z)^2},\quad
+\zeta''_z=-\frac{2\lambda L_0}{(L_0+\lambda z)^3}.
+\]
+
+3. Power-law \(L=L_0(z/z_0)^p\):
+\[
+L'=\frac{pL}{z},\ L''=\frac{p(p-1)L}{z^2},\quad
+\zeta'_z=\frac{1-p}{L},\ \zeta''_z=\frac{p(2p-1)}{zL}.
+\]
+
+4. Exponential \(L=L_0 e^{\lambda z}\):
+\[
+\zeta'_z=\frac{e^{-\lambda z}}{L_0}(1-\lambda z),\quad
+\zeta''_z=\frac{e^{-\lambda z}}{L_0}(\lambda^{2} z -2\lambda).
+\]
+
+Neglect test:
+\[
+E_{\text{omit}}=\left|\frac{\zeta''_z\,\partial_\zeta Ri_g}{(\zeta'_z)^2\,\partial_\zeta^2 Ri_g}\right|.
+\]
+Use constant-\(L\) form if \(E_{\text{omit}}<\epsilon\) (e.g. 5%).
+
+Perturbative small variation: \(L=L_0(1+\delta\ell(z)), |\delta|\ll1\):
+\[
+\zeta'_z=\frac{1}{L_0}\big[1-\delta(\ell+z\ell')\big]+O(\delta^2),\quad
+\zeta''_z=\frac{-\delta}{L_0}\big[2\ell'+z\ell''-2z\ell'^2\big]+O(\delta^2).
+\]
+
+Implementation hook (switch):
+```python
+def height_curvature(z, L, dL, d2L, ri1, ri2):
+    dzeta = (L - z*dL)/(L*L)
+    d2zeta = -2*dL/(L*L) - z*d2L/(L*L) + 2*z*dL*dL/(L*L*L)
+    return dzeta*dzeta*ri2 + d2zeta*ri1
+
+def height_curvature_if_constant(L0, ri2):
+    return ri2/(L0*L0)
+```
+
+Apply constant shortcut where \(|z dL/L|\) and \(E_{\text{omit}}\) both small.

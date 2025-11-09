@@ -205,6 +205,92 @@ Notes
 - Regularize L'(z), L''(z) (e.g., weak SG filter) to reduce amplification of noise in d²ζ/dz².
 - Report both mapped curvature and direct numeric curvature with uncertainty bands from differencing step.
 
+## 11B. Special Cases for \(L(z)\): Constant vs Structured Variability
+
+Notation:
+\[
+\zeta=\frac{z}{L(z)},\quad \frac{d\zeta}{dz}=\frac{L-zL'}{L^2},\quad \frac{d^{2}\zeta}{dz^{2}}=-\frac{2L'}{L^{2}}-\frac{zL''}{L^{2}}+\frac{2z(L')^{2}}{L^{3}}.
+\]
+General curvature mapping:
+\[
+\frac{\partial^{2}Ri_g}{\partial z^{2}}=\left(\frac{d\zeta}{dz}\right^2\frac{d^{2}Ri_g}{d\zeta^{2}}+\frac{d^{2}\zeta}{dz^{2}}\frac{dRi_g}{d\zeta}.
+\]
+
+Define nondimensional variation measures (evaluated at height z):
+\[
+\varepsilon_1=\frac{z|L'|}{L},\qquad \varepsilon_2=\frac{z^{2}|L''|}{L},\qquad \chi=\frac{|d^{2}\zeta/dz^{2}|}{(d\zeta/dz)^2}.
+\]
+Rule of thumb: constant-L approximation (use \(\partial_z^{2}Ri_g\simeq (1/L^2)\partial_{\zeta}^{2}Ri_g\)) is acceptable if \(\varepsilon_1\ll1\) and \(\chi\ll1\).
+
+Special profiles:
+
+1. Constant \(L=L_0\):
+\[
+L'=0,\ L''=0 \Rightarrow \frac{d\zeta}{dz}=\frac{1}{L_0},\ \frac{d^{2}\zeta}{dz^{2}}=0,\ 
+\boxed{\frac{\partial^{2}Ri_g}{\partial z^{2}}=\frac{1}{L_0^2}\frac{d^{2}Ri_g}{d\zeta^{2}}.}
+\]
+
+2. Affine \(L(z)=L_0+\lambda z\) (weak linear trend):
+\[
+L'= \lambda,\ L''=0,\ 
+\frac{d\zeta}{dz}=\frac{L_0}{(L_0+\lambda z)^2},\quad
+\frac{d^{2}\zeta}{dz^{2}}=-\frac{2\lambda L_0}{(L_0+\lambda z)^3}.
+\]
+Curvature correction term:
+\[
+\Delta_{\text{var}}=\frac{d^{2}\zeta}{dz^{2}}\frac{dRi_g}{d\zeta}.
+\]
+
+3. Power-law \(L(z)=L_0 (z/z_0)^p\) (e.g. evolving stratification layer):
+\[
+L'=\frac{pL}{z},\quad L''=\frac{p(p-1)L}{z^{2}},
+\]
+\[
+\frac{d\zeta}{dz}=\frac{1-p}{L},\quad
+\frac{d^{2}\zeta}{dz^{2}}=\frac{p( p-1)}{zL}-\frac{2p(1-p)}{zL}=\frac{p(2p-1)}{zL}.
+\]
+If \(p\to 0\) recover constant \(L\); if \(p<1\), sign of \(d\zeta/dz\) remains positive.
+
+4. Exponential \(L(z)=L_0 e^{\lambda z}\) (rapid growth/decay region):
+\[
+L'=\lambda L,\quad L''=\lambda^{2}L,\quad
+\frac{d\zeta}{dz}=\frac{e^{-\lambda z}}{L_0}-\frac{z\lambda e^{-\lambda z}}{L_0}
+=\frac{e^{-\lambda z}}{L_0}(1-\lambda z),
+\]
+\[
+\frac{d^{2}\zeta}{dz^{2}}=\frac{e^{-\lambda z}}{L_0}(\lambda^{2} z -2\lambda).
+\]
+
+5. Weakly varying (perturbative): write \(L(z)=L_0(1+\delta \ell(z))\), \(|\delta|\ll1\). Expand:
+\[
+\frac{d\zeta}{dz}=\frac{1}{L_0}\big[1-\delta(\ell+ z\ell')+O(\delta^2)\big],\quad
+\frac{d^{2}\zeta}{dz^{2}}=\frac{-\delta}{L_0}\big[2\ell'+z\ell''-2z\ell'^2\big]+O(\delta^2).
+\]
+Leading relative curvature correction:
+\[
+\frac{\Delta_{\text{var}}}{(1/L_0^2)d^{2}Ri_g/d\zeta^{2}}
+\approx -\delta L_0 \frac{2\ell'+z\ell''-2z\ell'^2}{d^{2}Ri_g/d\zeta^{2}}\,\frac{dRi_g}{d\zeta}.
+\]
+
+Error from ignoring variability:
+\[
+E_{\text{omit}}\equiv \left|\frac{d^{2}\zeta/dz^{2}\; dRi_g/d\zeta}{(d\zeta/dz)^2 d^{2}Ri_g/d\zeta^{2}}\right|=\chi.
+\]
+Set acceptance if \(E_{\text{omit}}<\epsilon\) (e.g. \(\epsilon=0.05\)).
+
+Minimal helper:
+```python
+def curvature_height(z, L, dL, d2L, ri_zeta, ri_zeta1, ri_zeta2):
+    # ri_zeta = Ri_g(ζ); ri_zeta1 = dRi_g/dζ; ri_zeta2 = d2Ri_g/dζ2
+    dzeta_dz = (L - z*dL)/(L*L)
+    d2zeta_dz2 = -2*dL/(L*L) - z*d2L/(L*L) + 2*z*dL*dL/(L*L*L)
+    return (dzeta_dz*dzeta_dz)*ri_zeta2 + d2zeta_dz2*ri_zeta1
+
+def curvature_height_constant(L0, ri_zeta2):
+    return ri_zeta2/(L0*L0)
+```
+Use constant form if \(\varepsilon_1,\chi\) below thresholds.
+
 ## 12. Dimensionless Control Parameters and Inflection Structure
 Define
 \[
@@ -677,4 +763,3 @@ def rig_curvature_generic(zeta, phi_m, phi_h, L):
     F = ph/(pm*pm)
     curv_zeta = F*(2*Vlog + zeta*(Vlog*Vlog - Wlog))
     return curv_zeta, curv_zeta/(L*L)
-```
