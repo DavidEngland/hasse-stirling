@@ -138,3 +138,86 @@ V_{\log}=v_h-2v_m,\quad W_{\log}=V_{\log}'.
 \]
 Including curvature at the first level reduces drag coefficient bias under stable stratification (see curvature toolkit).
 
+## 11. Heat vs Momentum Roughness (z0h ≠ z0) — Why and When
+Key points
+- Temperature is a passive (or weakly active) scalar near the surface and must be continuous at the interface (soil/water/skin) and below it, while velocity goes to zero at the roughness elements. Consequently, the effective scalar (heat) roughness length z0h is often much smaller than the momentum roughness z0.
+- Use kB−1 ≡ ln(z0/z0h) as the diagnostic. Typical ranges:
+  - Smooth/water: kB−1 ≈ 10–30 (cool-skin/warm-layer physics; z0h ≪ z0).
+  - Short crops/grass: kB−1 ≈ 2–7 (z0h < z0).
+  - Shrub/forest/urban: kB−1 ≈ 5–15 (displacement height d critical; within-canopy sources break simple logs).
+- Setting z0h = z0 is a neutral, smooth-surface convenience; it overestimates surface heat transfer when the molecular sublayer controls the scalar exchange (common in stable nights, calm wind, water).
+
+Practical choice
+- Prefer separate z0h (and z0q for moisture) when:
+  - Stable/very stable stratification (ζ > 0, weak turbulence).
+  - Over water/ice (cool-skin/warm-layer, surface renewal).
+  - Sparse canopies/rough urban fabrics (different source heights for momentum vs scalars).
+- z0h ≈ z0 is acceptable when:
+  - Neutral to mildly unstable over aerodynamically rough, homogeneous terrain with strong turbulence and shallow molecular sublayers.
+
+kB−1 parameterizations (for reference)
+- Empirical relations exist as functions of roughness Reynolds number Re∗ and stability. A simple diagnostic is to tune kB−1 so that observed sensible heat flux and profile match via the bulk formula in Section 9.
+
+## 12. Where the Temperature Log-Profile Holds, and Where It Breaks
+Log-layer validity (MOST)
+- Height range: Roughness sublayer top to 10–20% of boundary layer depth. Practically, (z − d)/z0 ≳ 30 and z/hmix ≲ 0.1.
+- Stratification: MOST with φh(ζ) holds for stationary, horizontally homogeneous flow with continuous turbulence.
+
+Breakdown regimes
+- Molecular sublayer (very near surface): Scalar transfer is diffusion-limited; the log law for θ is not valid within the viscous/conductive sublayer. For heat, the scalar sublayer thickness δh is O(ν/u∗)Pr−2/3; if measurement z ≲ O(δh), use surface renewal or skin models (especially over water/ice).
+- Very stable nights: Intermittent/laminar patches, suppressed turbulence; φh grows rapidly; log similarity degrades. Use capped/regularized φh or multi-layer resistance schemes.
+- Within canopies/urban arrays: Displacement height d required; below/within canopy the profile is not logarithmic; use canopy-resistance models (source/sink distributions).
+- Convective mixed layer aloft: The log segment is confined near the surface; above, nonlocal transport dominates (−w′θ′ terms not captured by local φh alone).
+
+Continuity at the interface
+- Temperature is continuous across the surface and into the substrate; the correct boundary condition is the surface (skin) temperature with conductive heat flux into soil/water. Thus, z0h is an effective parameter of the turbulent-convective layer, not a physical “zero-crossing” height like z0 for momentum.
+
+## 13. Which “Temperature” to Use (θ, θv, q, others?)
+- θ (potential temperature): use for scalar temperature profiles and sensible heat flux H over land; this is the standard in MOST for φh and ψh in the absence of strong moisture effects.
+- θv (virtual potential temperature): use for buoyancy, Obukhov length L, Ri and N2 (stability metrics) because buoyancy depends on moisture; compute L from θv (and heat flux w′θ′v).
+- q (specific humidity) or r (mixing ratio): treat as a separate scalar with its own roughness z0q (typically z0q ≈ z0h but not guaranteed). Latent heat flux uses q with φq analogous to φh.
+- Sonic temperature Ts: diagnostic from sonic anemometers; relates to θ and q (Ts ≈ θ(1 + 0.51q) near surface); use with care in moist conditions.
+- Over the ocean/ice: use skin SST/IST and cool-skin/warm-layer corrections; z0h and z0q often differ substantially from z0 due to surface renewal and molecular sublayers.
+
+Rule of thumb
+- Use θ for scalar profiles and H, θv for L, Ri, and buoyancy-related terms; treat humidity as a separate scalar with its own roughness.
+
+## 14. Implications for Modeling and Retrievals
+- Bulk transfer (Section 9) already supports z0h ≠ z0:
+  \[
+  C_H(z_r)=\frac{\kappa^2}{\big[\ln\frac{z_r-d}{z_0}-\psi_m(\zeta_r)\big]\big[\ln\frac{z_r-d}{z_{0h}}-\psi_h(\zeta_r)\big]}.
+  \]
+  If z0h is set equal to z0 in regimes with large kB−1, CH is biased low, underestimating H.
+- Retrieval consistency: When fitting z0 and z0h, enforce that θ is continuous at the surface and use observed surface temperature (skin) as the lower boundary; avoid extrapolating θ to z = z0h as if it were a physical temperature at that height.
+- Stability coupling: Since L uses θv, a mistaken choice of z0h can indirectly bias φh(ζ), L, and curvature diagnostics; calibrate kB−1 jointly with φh parameters (αh, βh) using flux and profile data.
+
+## 15. Quick Guidance (Rules of Thumb)
+- If in doubt, estimate kB−1 = ln(z0/z0h) from flux–profile pairs; expect kB−1 > 0 in most cases; water/ice often much larger than land.
+- Keep z0h = z0 only for rough, neutral to mildly unstable flow with strong turbulence and shallow molecular sublayers.
+- Use θ for temperature profiles and H; use θv for L, Ri, and curvature; treat humidity (q) with its own roughness z0q.
+- Over canopies/urban, include displacement d and consider multi-layer resistance; within-canopy temperatures do not follow a log law.
+
+## 16. Polar / Arctic Implications of Setting z0h = z0
+Problem context
+- Polar surfaces (sea ice, snow, thin melt ponds) often have molecular/renewal processes making z0h ≪ z0 (large kB−1). Forcing z0h = z0 removes this contrast.
+Key impacts
+- Sensible heat flux H overestimated in very stable cases if model compensates via tuned φh (or underestimated if using bulk transfer directly); either misrepresents surface cooling rate → inversion strength error.
+- Obukhov length L error: θv flux term biased → ζ=z/L mis-scaled → shifts stability function curvature (Ri_g growth). Neutral-curvature invariant (2Δ) applied at wrong ζ → grid-dependent mixing biases.
+- Ri_g curvature misclassification: inflated (or deflated) ∂²Ri_g/∂z² alters triggering of SBL turbulence shutdown; affects nocturnal and polar night inversion persistence.
+- Feedback to Arctic Amplification: incorrect partition of turbulent vs radiative cooling modifies surface temperature trend; biases amplify through ice–albedo seasonal transitions (earlier melt onset or delayed freeze).
+- Large-scale oscillations (AO/NAO): surface stress and heat flux anomalies modify lower-tropospheric temperature gradients, influencing baroclinicity; cumulative bias in stable-season fluxes can shift mean AO phase statistics.
+- Vertical diffusion tuning compensation: models may lower critical Ri or lengthen φ tails to counter z0h=z0 simplification → introduces artificial grid dependence.
+- Energy budget closure: latent vs sensible flux partition error (if z0q also set equal) leads to spurious moisture tendencies, altering cloud formation and longwave feedbacks.
+Diagnostic signals
+- kB−1 near zero in outputs over ice/snow.
+- Systematic L too small (or large) compared with tower/ship observations.
+- Curvature spectrum (∂²Ri_g/∂z²) flatter than observational retrievals in strong stability windows.
+Recommended actions
+- Implement distinct z0h (and z0q) parameterization tied to roughness Reynolds number or ice/snow surface state.
+- Use curvature-aware correction (neutral invariance + tail modifier) with proper ζ scaling from corrected L.
+- Validate kB−1 climatology and Ri_g curvature against Arctic sites (e.g. SHEBA, Barrow) before AO/NAO attribution studies.
+- Include HS-assisted ζ↔Ri inversion to reduce numerical damping artifacts in stable polar layers.
+
+Net implication
+Using z0h = z0 in polar modeling distorts heat flux and stability scaling, propagating through Ri_g curvature to boundary-layer mixing, amplifying or muting Arctic Amplification signals and modulating large-scale oscillation statistics; separation of scalar and momentum roughness is therefore required for physically consistent SBL feedbacks.
+
