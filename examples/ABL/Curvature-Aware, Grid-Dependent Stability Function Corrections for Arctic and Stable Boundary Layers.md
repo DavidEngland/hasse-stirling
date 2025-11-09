@@ -5,6 +5,103 @@
 ## Abstract
 Stable boundary layers are notoriously grid-sensitive in Arctic climate and NWP models. We introduce a curvature-aware analytic correction to Monin–Obukhov Similarity Theory (MOST) stability functions that embeds vertical grid spacing directly into the functional form while preserving the neutral curvature invariant \(\partial_\zeta^2 Ri_g|_{0}=2\Delta\) with \(\Delta=\alpha_h\beta_h-2\alpha_m\beta_m\). The approach couples a neutral-curvature invariance constraint, a grid-scaled exponential tail modifier, and a Hasse–Stirling (HS) series accelerator for fast, reproducible evaluation of \(\phi_{m,h}\), \(Ri_g\), and ζ(Ri). Diagnostics (curvature amplification ratio, inflection height, omission error for variable \(L(z)\)) guide when full mapping or constant‑L shortcuts apply. Idealized tests show >40% reduction in curvature error and improved stable boundary layer flux convergence on coarse grids. The framework enhances physical consistency, supports adaptive vertical refinement triggers, and yields tabulated, transparent coefficients for reproducible implementation.
 
+## Extended Abstract (Internal Proposal – Circulation Draft)
+
+### 1. Motivation
+Stable boundary layers (SBLs), especially in Arctic regimes, exhibit strong sensitivity to vertical grid spacing (Δz). Coarse grids distort early gradient Richardson number (Ri_g) curvature, delaying or exaggerating turbulence suppression and widening projection spread for Arctic Amplification.
+
+### 2. Gap
+Existing remedies (long-tail φ functions, tuned critical Ri, ad hoc diffusion floors) lack:
+- A neutral curvature invariance constraint.
+- Explicit grid-spacing parameterization.
+- Analytic diagnostics for deciding constant-L versus variable-L mapping.
+- Reproducible fast evaluation (ζ↔Ri inversion) without iterative instability.
+
+### 3. Core Idea
+Embed grid spacing directly into MOST stability functions via a tail modifier \(f_c(\zeta,\Delta z)=\exp\{-D(\zeta/\zeta_r)(\Delta z/\Delta z_r)\}\) while enforcing
+\[
+\boxed{\partial_\zeta^2 Ri_g^{*}|_{0}=2\Delta}
+\]
+so near-neutral curvature remains unchanged. Adjust only higher-order curvature growth that drives grid-dependent bias.
+
+### 4. Objectives
+O1 Preserve neutral curvature (physics) while reducing coarse-grid curvature amplification.  
+O2 Provide robust ζ(Ri) inversion using HS-accelerated series + single Newton step.  
+O3 Deliver adaptive refinement triggers based on \(|W_{\log}/V_{\log}^2|\) and omission metric \(E_{\text{omit}}\).  
+O4 Validate across φ families (power-law, quadratic surrogate, regularized) and Arctic multi-season datasets.  
+O5 Package an open-source module + reproducible notebooks (LES + tower comparisons).
+
+### 5. Method Summary
+1. Analytical curvature: \(\partial_\zeta^2 Ri_g = F[2V_{\log}+\zeta(V_{\log}^2-W_{\log})]\), \(F=\phi_h/\phi_m^2\).
+2. Grid-tail correction with exponents a,b (choose b=2a for invariance).
+3. HS tables accelerate evaluation of \(\log(1-\beta\zeta)\) → fast φ, F, V_log, W_log.
+4. Variable-L decision using omission metric:
+\[
+E_{\text{omit}}=\left|\frac{\zeta''_z\,\partial_\zeta Ri_g}{(\zeta'_z)^2\,\partial_\zeta^2 Ri_g}\right|
+\]
+5. Calibration: choose D to minimize normalized curvature error vs fine-grid reference.
+
+### 6. Innovation
+- Neutral curvature anchoring: separates physical near-neutral behavior from numerical tail adjustments.
+- Grid-aware analytical modifier replaces empirical long-tail forms.
+- HS-assisted ζ(Ri) inversion eliminates iterative ζ loops (performance + stability).
+- Diagnostics unify regime classification (inflection presence, amplification ratio A(ζ)).
+
+### 7. Work Plan (Indicative 6-Month Timeline)
+M1 Fit baseline (α,β) from neutral segments; compute Δ, c1.  
+M2 Implement tail modifier; heuristic D selection; initial tests (idealized profiles).  
+M3 HS series + ζ(Ri) inversion integration; benchmark speed.  
+M4 LES + tower validation (GABLS-style, Arctic sites); curvature & flux metrics.  
+M5 Adaptive refinement trigger evaluation; Δz sweeps (2–100 m).  
+M6 Packaging, documentation, internal manuscript draft.
+
+### 8. Student Role (Thesis Scope)
+- Lead calibration of D functional form (e.g. logistic in A(ζ), Ri, Δz).
+- Construct dataset of curvature diagnostics across grid sets.
+- Implement HS coefficient table generation + error tracking.
+- Prepare comparative figures (curvature vs ζ, amplification ratio, omission metric distributions).
+- Co-author primary method manuscript; sole lead on application/validation paper.
+
+### 9. Resources & Data
+- Existing LES ensembles (stable nights / Arctic cases).
+- Tower observations (wind, temperature, flux, L estimates).
+- Computing: moderate (Python/NumPy; optional JIT); no HPC required for prototype.
+- Codebase: existing MOST toolkit + HS series routines.
+
+### 10. Expected Deliverables
+D1 Curvature-aware φ correction library (MIT or BSD).  
+D2 Validation dataset (NetCDF / CSV) with curvature spectra and diagnostics.  
+D3 Two manuscripts (Method; Application).  
+D4 Adaptive refinement decision aid (simple callable returning flag per layer).  
+D5 HS coefficient tables (versioned, DOI via Zenodo).
+
+### 11. Success Metrics
+- ≥40% reduction coarse-grid curvature error (A(ζ) closer to 1) across test cases.
+- Neutral curvature deviation <5%.  
+- ζ(Ri) inversion speedup ≥25% vs iterative baseline at target accuracy.  
+- Improved flux convergence (e.g. heat flux bias reduction >15% at Δz=60 m).  
+- Reproducible runs with documented parameter identifiability.
+
+### 12. Decision Points
+- Acceptable complexity of D functional form (simple exponential vs logistic).
+- Thresholds for adaptive refinement (choose default: \(|W_{\log}/V_{\log}^2|>0.5\) or \(E_{\text{omit}}>0.05\)).
+- Inclusion of quadratic surrogate (Q‑SBL) or regularized power law as default stable tail.
+- Level of planetary extension (optional) for second manuscript.
+
+### 13. Risk & Mitigation (Condensed)
+| Risk | Mitigation |
+|------|------------|
+| Overfitting D | Multi-site cross-validation |
+| Pole proximity instability | Regularized / capped surrogate switch |
+| Sparse extreme-stability data | Synthetic LES augmentation |
+| HS series divergence at high ζ | Adaptive N via remainder bound |
+
+### 14. Request
+Confirm availability of a graduate student (Masters or PhD) to take ownership of D calibration, HS integration, and validation work packages (target start: next academic term). Feedback on scope and milestone ordering invited.
+
+### 15. Contact
+Please advise on candidate student names and timeline constraints; adjust work plan accordingly.
+
 ## 1. Introduction
 Arctic Amplification remains underconstrained partly due to vertical resolution limits in representing shallow, strongly stable layers. Classical MOST stability functions assume implicit grid adequacy; coarse discretization inflates bulk Ri, triggering excessive mixing suppression or ad hoc tail extensions. Existing remedies (long-tail empirical forms, critical Ri tuning) lack curvature-based diagnostics tying parameter choices to physical stratification evolution. This work centers on analytic curvature of \(Ri_g\) to design resolution-aware corrections, minimizing divergence between coarse and fine-grid solutions without arbitrary diffusivity floors.
 
