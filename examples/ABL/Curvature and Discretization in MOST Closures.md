@@ -100,10 +100,10 @@ To enforce curvature continuity from near-neutral to elevated stable layers:
 |--------|---------|-----------|
 | \(2\Delta\) | Neutral curvature sign/magnitude | Report |
 | \(\zeta_{\text{inf}}\) | Inflection location | Only if real & < domain limit |
-| \(\max|\partial_z^2Ri_g|\) | Vertical stability stress | Watch for spikes |
-| \(\chi\) fraction | Variable-L impact | <10% desirable |
-| \(E_i\) distribution | Layer reconstruction error | >0.2 flagged |
-| Blend mismatch | Curvature continuity | <5% |
+| \(\max\lvert \partial_z^2 Ri_g \rvert\) | Vertical stability stress | Watch for spikes |
+| \(\chi\) fraction | Variable-L impact | &lt;10% desirable |
+| \(E_i\) distribution | Layer reconstruction error | &gt;0.2 flagged |
+| Blend mismatch | Curvature continuity | &lt;5% |
 
 ## 9. Figure Caption (Curvature vs. \(\zeta\))
 Caption candidate:
