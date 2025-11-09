@@ -310,3 +310,25 @@ def ri_to_phi_wrappers(tag: str,
         return phi_h(z)
 
     return fm, fh
+
+def rig_derivatives_zeta(
+    zeta: float,
+    phi_m: callable,
+    phi_h: callable,
+) -> tuple[float, float, float, float]:
+    """
+    Return (dRi_g/dζ, d²Ri_g/dζ², F, G) at ζ for given φ_m, φ_h.
+    Uses logarithmic derivatives:
+      F = φ_h / φ_m²
+      G = d(ln F)/dζ
+      dRi/dζ = F (1 + ζ G)
+      d²Ri/dζ² = F [ 2 G + ζ (G² - G') ], with G' = dG/dζ
+    """
+    F_fun = F_from(phi_m, phi_h)
+    F_val = F_fun(zeta)
+    # G and G' by differentiating log(F)
+    G = _central_diff(lambda zz: math.log(max(F_fun(zz), 1e-300)), zeta)
+    Gp = _second_diff(lambda zz: math.log(max(F_fun(zz), 1e-300)), zeta)
+    dRi_dzeta = F_val * (1.0 + zeta * G)
+    d2Ri_dzeta2 = F_val * (2.0 * G + zeta * (G * G - Gp))
+    return dRi_dzeta, d2Ri_dzeta2, F_val, G
